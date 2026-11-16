@@ -1,0 +1,119 @@
+{
+  "type": "FeatureCollection",
+  "name": "Desa_Sadeng_Leuwisadeng_Verified_Spatial_Data",
+  "metadata": {
+    "desa": "Sadeng",
+    "kecamatan": "Leuwisadeng",
+    "kabupaten": "Bogor",
+    "provinsi": "Jawa Barat",
+    "kode_kemendagri_bps": "32.01.39.2007",
+    "kode_pos": "16640 / 16641",
+    "batas_administrasi": {
+      "utara": "Desa Banyuresmi, Kec. Cigudeg",
+      "selatan": "Desa Babakan Sadeng, Kec. Leuwisadeng",
+      "barat": "Desa Kalong II, Kec. Leuwisadeng",
+      "timur": "Desa Sibanteng, Kec. Leuwisadeng"
+    },
+    "catatan_validitas": "Koordinat titik diturunkan dari Plus Code resmi Google Maps yang terverifikasi. Poligon batas desa tidak dibuat secara perkiraan/fabrikasi untuk menjaga akurasi spasial; unduh poligon resmi kode 32.01.39.2007 melalui portal TanahAir BIG (https://tanahair.indonesia.go.id) atau InaRISK BNPB (https://inarisk.bnpb.go.id)."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "center_kantor_desa_sadeng",
+        "nama": "Kantor Desa Sadeng (Titik Pusat Administrasi Desa)",
+        "kategori": "Pusat Pemerintahan Desa",
+        "alamat": "Jl. Raya Sadeng (Plus Code: CHQR+F4W), Desa Sadeng, Kec. Leuwisadeng, Kab. Bogor 16640",
+        "latitude": -6.561262,
+        "longitude": 106.590328,
+        "kode_wilayah": "32.01.39.2007",
+        "ketinggian_mdpl": "200 - 228 mdpl",
+        "sumber_verifikasi": "Google Maps Plus Code 6P58CHQR+F4W & Portal Bestie Pemkab Bogor"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.590328,
+          -6.561262
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "edu_yanuhi_kp_paku",
+        "nama": "Yayasan Nurul Hidayah Pusat (YANUHI) / Pesantren Nurul Hidayah Al Bakriyah",
+        "kategori": "Fasilitas Pendidikan & Referensi Wilayah Kp. Paku (Zona Rawan Luapan Sungai Cimanggung/Cinanggung)",
+        "alamat": "Jl. Raya Paku Sadeng RT.05/RW.02 (Plus Code: CHJV+QMX), Desa Sadeng, Kec. Leuwisadeng",
+        "latitude": -6.568013,
+        "longitude": 106.594234,
+        "catatan_risiko": "Kampung Paku merupakan lokasi terdampak banjir bandang luapan Sungai Cimanggung/Cinanggung (24 April 2023).",
+        "sumber_verifikasi": "Google Maps Plus Code 6P58CHJV+QMX & Laporan BPBD Kab. Bogor / detikNews"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.594234,
+          -6.568013
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "edu_mi_alkhoeriyah",
+        "nama": "MI Al Khoeriyah Sadeng",
+        "kategori": "Fasilitas Pendidikan (Madrasah Ibtidaiyah)",
+        "alamat": "Plus Code: CHMR+P6J, Kp. Sadeng, Desa Sadeng, Kec. Leuwisadeng, Kab. Bogor 16640",
+        "latitude": -6.565663,
+        "longitude": 106.590516,
+        "sumber_verifikasi": "Google Maps Plus Code 6P58CHMR+P6J & Profil Desa Sadeng"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.590516,
+          -6.565663
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "edu_sdn_sukajadi_cikadu",
+        "nama": "SDN Sukajadi (Wilayah Kp. Cikadu / RW 005)",
+        "kategori": "Fasilitas Pendidikan Dasar",
+        "alamat": "Jl. Kp. Cikadu (Plus Code: CHWG+PJV), Desa Sadeng, Kec. Leuwisadeng, Kab. Bogor 16640",
+        "latitude": -6.553138,
+        "longitude": 106.576547,
+        "sumber_verifikasi": "Google Maps Plus Code 6P58CHWG+PJV & Profil Desa Sadeng"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.576547,
+          -6.553138
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "gov_kecamatan_leuwisadeng",
+        "nama": "Kantor Kecamatan Leuwisadeng (Titik Koordinasi Tingkat Kecamatan)",
+        "kategori": "Pemerintahan Kecamatan",
+        "alamat": "Plus Code: CJM7+WQX, Leuwisadeng, Kec. Leuwisadeng, Kab. Bogor 16640",
+        "latitude": -6.565138,
+        "longitude": 106.614484,
+        "sumber_verifikasi": "Google Maps Plus Code 6P58CJM7+WQX"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.614484,
+          -6.565138
+        ]
+      }
+    }
+  ]
+}

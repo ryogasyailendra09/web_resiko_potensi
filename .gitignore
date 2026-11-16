@@ -1,0 +1,22 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+secrets/
+private/
+*.pem
+*.key
+*.crt
+
+# Sensitive or working datasets
+data/private/
+data/rahasia/
+data/*sensitive*
+data/*rahasia*
+data/*.xlsx
+data/*.xls
+
+# Runtime and editor output
+*.log
+node_modules/
+.vscode/settings.json

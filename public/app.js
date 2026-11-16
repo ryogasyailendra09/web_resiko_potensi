@@ -15,10 +15,30 @@ function render(data) {
   el('potentials').innerHTML = data.potentials.map((item) => `<article class="potential-card"><span class="potential-number">${item.number}</span><span class="tag">${item.tag}</span><h3>${iconMap[item.icon]} ${item.title}</h3><p>${item.detail}</p></article>`).join('');
   el('programs').innerHTML = data.programs.map((item, index) => `<article class="program-item"><span class="program-index">0${index + 1}</span><div><h3>${item.title}</h3><span class="program-type">${item.type}</span></div><p>${item.detail}</p></article>`).join('');
   el('kkn').innerHTML = data.kkn.map((item) => `<article class="timeline-item"><span class="timeline-year">${item.year}</span><h3>${item.title}</h3><p>${item.detail}</p></article>`).join('');
+  el('rw-table').innerHTML = `<div class="rw-table-head"><span>Wilayah</span><span>Penduduk</span><span>KK</span><span>Rumah</span></div>${data.rw.map((item) => `<div class="rw-row"><span><b>${item.name}</b><small>${item.area}</small></span><strong>${item.population.toLocaleString('id-ID')}</strong><span>${item.families.toLocaleString('id-ID')}</span><span>${item.homes.toLocaleString('id-ID')}</span></div>`).join('')}`;
+  el('facilities').innerHTML = data.facilities.map((item) => `<article class="facility-card"><span>${item.category}</span><strong>${item.count}</strong><p>${item.detail}</p></article>`).join('');
+  initMap(data.spatial);
   el('source-file').textContent = data.source.file;
   el('source-count').textContent = `${data.sources.length} sumber terindeks · ${data.source.characters.toLocaleString('id-ID')} karakter`; 
   renderSources(data.sources);
   el('source-filter').addEventListener('input', (event) => { const query = event.target.value.toLowerCase(); renderSources(data.sources.filter((source) => `${source.group} ${source.name}`.toLowerCase().includes(query))); });
+}
+
+function initMap(spatial) {
+  if (!window.L || !spatial?.points?.length) return;
+  const [longitude, latitude] = spatial.points[0].coordinates;
+  const map = L.map('sadeng-map', { zoomControl: false, scrollWheelZoom: false }).setView([latitude, longitude], 13);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 }).addTo(map);
+  const bounds = [];
+  spatial.points.forEach((point) => {
+    const [pointLongitude, pointLatitude] = point.coordinates;
+    bounds.push([pointLatitude, pointLongitude]);
+    const marker = L.circleMarker([pointLatitude, pointLongitude], { radius: 7, color: '#ff8966', weight: 2, fillColor: '#f2c56f', fillOpacity: .95 });
+    marker.bindPopup(`<strong>${point.name}</strong><br><small>${point.category}</small><br><small>${point.address || ''}</small>`).addTo(map);
+  });
+  el('map-point-count').textContent = spatial.points.length;
+  map.fitBounds(bounds, { padding: [28, 28] });
 }
 
 function renderSources(sources) { el('sources').innerHTML = sources.map((source) => `<div class="source-item"><span>${source.group}</span><a href="${source.url}" target="_blank" rel="noreferrer">${source.name} <b class="source-arrow">↗</b></a></div>`).join('') || '<p class="body-copy">Sumber tidak ditemukan.</p>'; }

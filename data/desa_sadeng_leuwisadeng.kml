@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Data Spasial Terverifikasi - Desa Sadeng, Kec. Leuwisadeng, Kab. Bogor (32.01.39.2007)</name>
+    <description>Koordinat pusat administrasi dan fasilitas publik terverifikasi di Desa Sadeng (Kode Wilayah: 32.01.39.2007). Batas wilayah resmi: Utara Desa Banyuresmi (Cigudeg), Selatan Desa Babakan Sadeng, Barat Desa Kalong II, Timur Desa Sibanteng.</description>
+    <Placemark>
+      <name>Kantor Desa Sadeng (Titik Pusat Administrasi Desa)</name>
+      <description>id: center_kantor_desa_sadeng
+kategori: Pusat Pemerintahan Desa
+alamat: Jl. Raya Sadeng (Plus Code: CHQR+F4W), Desa Sadeng, Kec. Leuwisadeng, Kab. Bogor 16640
+latitude: -6.561262
+longitude: 106.590328
+kode_wilayah: 32.01.39.2007
+ketinggian_mdpl: 200 - 228 mdpl
+sumber_verifikasi: Google Maps Plus Code 6P58CHQR+F4W &amp; Portal Bestie Pemkab Bogor</description>
+      <Point>
+        <coordinates>106.590328,-6.561262,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Yayasan Nurul Hidayah Pusat (YANUHI) / Pesantren Nurul Hidayah Al Bakriyah</name>
+      <description>id: edu_yanuhi_kp_paku
+kategori: Fasilitas Pendidikan &amp; Referensi Wilayah Kp. Paku (Zona Rawan Luapan Sungai Cimanggung/Cinanggung)
+alamat: Jl. Raya Paku Sadeng RT.05/RW.02 (Plus Code: CHJV+QMX), Desa Sadeng, Kec. Leuwisadeng
+latitude: -6.568013
+longitude: 106.594234
+catatan_risiko: Kampung Paku merupakan lokasi terdampak banjir bandang luapan Sungai Cimanggung/Cinanggung (24 April 2023).
+sumber_verifikasi: Google Maps Plus Code 6P58CHJV+QMX &amp; Laporan BPBD Kab. Bogor / detikNews</description>
+      <Point>
+        <coordinates>106.594234,-6.568013,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>MI Al Khoeriyah Sadeng</name>
+      <description>id: edu_mi_alkhoeriyah
+kategori: Fasilitas Pendidikan (Madrasah Ibtidaiyah)
+alamat: Plus Code: CHMR+P6J, Kp. Sadeng, Desa Sadeng, Kec. Leuwisadeng, Kab. Bogor 16640
+latitude: -6.565663
+longitude: 106.590516
+sumber_verifikasi: Google Maps Plus Code 6P58CHMR+P6J &amp; Profil Desa Sadeng</description>
+      <Point>
+        <coordinates>106.590516,-6.565663,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>SDN Sukajadi (Wilayah Kp. Cikadu / RW 005)</name>
+      <description>id: edu_sdn_sukajadi_cikadu
+kategori: Fasilitas Pendidikan Dasar
+alamat: Jl. Kp. Cikadu (Plus Code: CHWG+PJV), Desa Sadeng, Kec. Leuwisadeng, Kab. Bogor 16640
+latitude: -6.553138
+longitude: 106.576547
+sumber_verifikasi: Google Maps Plus Code 6P58CHWG+PJV &amp; Profil Desa Sadeng</description>
+      <Point>
+        <coordinates>106.576547,-6.553138,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Kantor Kecamatan Leuwisadeng (Titik Koordinasi Tingkat Kecamatan)</name>
+      <description>id: gov_kecamatan_leuwisadeng
+kategori: Pemerintahan Kecamatan
+alamat: Plus Code: CJM7+WQX, Leuwisadeng, Kec. Leuwisadeng, Kab. Bogor 16640
+latitude: -6.565138
+longitude: 106.614484
+sumber_verifikasi: Google Maps Plus Code 6P58CJM7+WQX</description>
+      <Point>
+        <coordinates>106.614484,-6.565138,0</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>
