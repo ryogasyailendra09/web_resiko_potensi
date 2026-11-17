@@ -34,13 +34,13 @@ def ambil_poligon_dari_big(shp_path):
     return json.loads(hasil.to_json())["features"]
 
 
-def ambil_poligon_dari_osm():
+def ambil_poligon_dari_osm(nama_wilayah="Sadeng", nama_area="Leuwisadeng", feature_id="boundary_desa_sadeng"):
     query = """
     [out:json][timeout:60];
-    area["name"="Leuwisadeng"]["boundary"="administrative"]->.kec;
-    relation(area.kec)["boundary"="administrative"]["name"="Sadeng"];
+    area["name"="{area}"]["boundary"="administrative"]->.area;
+    relation(area.area)["boundary"="administrative"]["name"="{nama}"];
     out geom;
-    """
+    """.format(area=nama_area, nama=nama_wilayah)
     data = urllib.parse.urlencode({"data": query}).encode("utf-8")
     endpoints = [
         "https://overpass-api.de/api/interpreter",
@@ -90,7 +90,7 @@ def ambil_poligon_dari_osm():
                 rings.append(ring)
 
     if not rings:
-        raise RuntimeError("Relasi batas Desa Sadeng tidak ditemukan di Overpass API.")
+        raise RuntimeError(f"Relasi batas {nama_wilayah} tidak ditemukan di Overpass API.")
 
     geom = (
         {"type": "Polygon", "coordinates": [rings[0]]}
@@ -101,8 +101,8 @@ def ambil_poligon_dari_osm():
         {
             "type": "Feature",
             "properties": {
-                "id": "boundary_desa_sadeng",
-                "nama": "Batas Wilayah Administratif Desa Sadeng",
+                "id": feature_id,
+                "nama": f"Batas Wilayah Administratif {nama_wilayah}",
                 "kecamatan": "Leuwisadeng",
                 "kabupaten": "Bogor",
                 "kode_wilayah": "32.01.39.2007",
@@ -167,10 +167,21 @@ if __name__ == "__main__":
         print("Shapefile BIG tidak ditemukan lokal; menarik batas dari endpoint Overpass...")
         try:
             fitur_poligon = ambil_poligon_dari_osm()
+            try:
+                fitur_poligon.extend(ambil_poligon_dari_osm("Leuwisadeng", "Bogor", "boundary_kecamatan_leuwisadeng"))
+            except RuntimeError as error:
+                print(f"Peringatan boundary kecamatan: {error}")
         except RuntimeError as error:
             print(f"Peringatan: {error}")
-            print("Melanjutkan dengan titik terverifikasi tanpa membuat poligon perkiraan.")
+            print("Mempertahankan polygon lama jika tersedia; tidak membuat poligon perkiraan.")
             fitur_poligon = []
+            if os.path.exists(output_geojson):
+                try:
+                    with open(output_geojson, "r", encoding="utf-8") as f:
+                        fitur_poligon = [feature for feature in json.load(f).get("features", []) if feature.get("geometry", {}).get("type") in ("Polygon", "MultiPolygon")]
+                    print(f"Mempertahankan {len(fitur_poligon)} polygon dari output sebelumnya.")
+                except (OSError, json.JSONDecodeError) as read_error:
+                    print(f"Peringatan membaca output lama: {read_error}")
 
     # Gabungkan dengan titik fasilitas dari desa_sadeng_leuwisadeng.geojson jika ada
     fitur_gabungan = list(fitur_poligon)

@@ -7,6 +7,10 @@ const root = __dirname;
 const port = process.env.PORT || 3000;
 const sourcePath = path.join(root, 'data', 'rangkuman_data_riset_kkn_desa_sadeng_kec_leuwisadeng.md');
 const spatialPath = path.join(root, 'data', 'desa_sadeng_lengkap_poligon.geojson');
+const surveySpatialPath = path.join(root, 'data', 'peta_kebencanaan_evakuasi_desa_sadeng_final.geojson');
+const nearbySpatialPath = path.join(root, 'data', 'poi_fasilitas_wisata_sadeng_leuwisadeng.geojson');
+const previewCache = new Map();
+const previewHosts = new Set(['cnnindonesia.com', 'liputan6.com', 'detik.com', 'ppid.bogorkab.go.id', 'beritasatu.com']);
 
 const dashboard = {
   village: 'Desa Sadeng',
@@ -39,6 +43,13 @@ const dashboard = {
     { category: 'Kesehatan', count: '10 Posyandu', detail: 'Ditambah 1 balai pengobatan dan 1 bidan desa' },
     { category: 'Pertanian', count: '2 kelompok', detail: 'Gapoktan manggis dan kelompok tani pala' },
     { category: 'Wisata', count: '1 kawasan', detail: 'Seureuh Hejo di Kp. Gunung Seureuh' }
+  ],
+  nearby: [
+    { kind: 'Pasar', name: 'Pasar Rakyat Leuwisadeng', detail: 'Terpetakan dengan Plus Code terverifikasi; berada di koridor wilayah Sadeng.' },
+    { kind: 'Kesehatan', name: 'Puskesmas Sadeng Pasar', detail: 'Rujukan kesehatan yang disebut dalam profil desa; titik koordinat belum tersedia.' },
+    { kind: 'Kesehatan', name: 'Puskesmas Leuwisadeng', detail: 'Rujukan tingkat kecamatan; titik koordinat belum tersedia.' },
+    { kind: 'Wisata', name: 'Seureuh Hejo', detail: 'Wisata alam dan camping ground di Kp. Gunung Seureuh; bukan curug.' },
+    { kind: 'Curug', name: 'Curug Rubina & Curug Wangun Jaya', detail: 'Dua curug terpetakan di sekitar kecamatan; keduanya berada di luar batas administratif Desa Sadeng.' }
   ],
   seasons: [
     { key: 'hujan', name: 'Musim hujan', period: 'Akhir–awal tahun', tone: 'red', trigger: 'Hujan lebat berdurasi lama, alur sungai menyempit, dan lereng berbukit.', effects: ['Banjir bandang di Kp. Paku dan Kp. Cikadu', 'Longsor pada kontur berbukit', 'Panen terganggu dan risiko penyakit berbasis air'], metric: 'Risiko tinggi', icon: 'rain' },
@@ -88,24 +99,66 @@ const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`);
   if (url.pathname === '/api/dashboard') {
     const markdown = fs.readFileSync(sourcePath, 'utf8');
-    const spatial = JSON.parse(fs.readFileSync(spatialPath, 'utf8'));
-    const points = spatial.features.filter((feature) => feature.geometry?.type === 'Point').map((feature) => ({
-      id: feature.properties.id,
-      name: feature.properties.nama,
-      category: feature.properties.kategori,
-      address: feature.properties.alamat,
-      source: feature.properties.sumber_verifikasi,
-      photo: feature.properties.foto_url || feature.properties.photo || null,
-      description: feature.properties.deskripsi || feature.properties.catatan_risiko || null,
-      coordinates: feature.geometry.coordinates
-    }));
-    const boundary = spatial.features.find((feature) => ['Polygon', 'MultiPolygon'].includes(feature.geometry?.type));
-    return send(response, 200, JSON.stringify({ ...dashboard, spatial: { points, boundary: boundary || null, metadata: spatial.metadata || {} }, source: { file: path.basename(sourcePath), characters: markdown.length } }), 'application/json; charset=utf-8');
+    const baseSpatial = JSON.parse(fs.readFileSync(spatialPath, 'utf8'));
+    const surveySpatial = fs.existsSync(surveySpatialPath) ? JSON.parse(fs.readFileSync(surveySpatialPath, 'utf8')) : { features: [] };
+    const nearbySpatial = fs.existsSync(nearbySpatialPath) ? JSON.parse(fs.readFileSync(nearbySpatialPath, 'utf8')) : { features: [] };
+    const features = [...baseSpatial.features, ...surveySpatial.features, ...nearbySpatial.features];
+    const points = features.filter((feature) => feature.geometry?.type === 'Point').map((feature) => {
+      const properties = feature.properties || {};
+      const layer = properties.layer || 'fasilitas';
+      const rawCategory = `${properties.kategori || ''} ${properties.nama || ''}`.toLowerCase();
+      const nearbyKind = rawCategory.includes('pasar') ? 'market' : rawCategory.includes('puskesmas') ? 'health' : rawCategory.includes('curug') || rawCategory.includes('wisata') ? 'tourism' : null;
+      return {
+        id: properties.id,
+        layer: nearbyKind || layer,
+        name: properties.nama,
+        category: properties.kategori || properties.kategori_risiko || properties.layer,
+        riskLevel: properties.tingkat_risiko || null,
+        address: properties.alamat,
+        source: properties.sumber_verifikasi,
+        photo: properties.foto_lokal || properties.foto_url || properties.photo || null,
+        photoReference: properties.foto_referensi_url || null,
+        description: properties.deskripsi || properties.deskripsi_singkat || properties.catatan_risiko || properties.fungsi || null,
+        capacity: properties.kapasitas_maksimal_orang || null,
+        photoStatus: properties.status_foto_lokal || null,
+        precision: properties.presisi_koordinat || null,
+        coordinates: feature.geometry.coordinates
+      };
+    });
+    const boundaries = features.filter((feature) => ['Polygon', 'MultiPolygon'].includes(feature.geometry?.type));
+    const boundary = boundaries.find((feature) => feature.properties?.id === 'boundary_desa_sadeng') || boundaries[0];
+    const districtBoundary = boundaries.find((feature) => feature.properties?.id === 'boundary_kecamatan_leuwisadeng') || null;
+    const routes = features.filter((feature) => feature.geometry?.type === 'LineString').map((feature) => ({ ...feature.properties, geometry: feature.geometry }));
+    return send(response, 200, JSON.stringify({ ...dashboard, spatial: { points, routes, boundary: boundary || null, districtBoundary, metadata: baseSpatial.metadata || {} }, source: { file: path.basename(sourcePath), characters: markdown.length } }), 'application/json; charset=utf-8');
+  }
+  if (url.pathname === '/api/article-preview') {
+    return articlePreview(url.searchParams.get('source'), response);
   }
   const requested = url.pathname === '/' ? '/public/index.html' : url.pathname;
   const file = path.normalize(path.join(root, requested));
   if (!file.startsWith(root) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return send(response, 404, 'Not found');
   send(response, 200, fs.readFileSync(file), mime[path.extname(file)] || 'application/octet-stream');
 });
+
+async function articlePreview(source, response) {
+  let parsed;
+  try { parsed = new URL(source); } catch { return send(response, 400, JSON.stringify({ error: 'Sumber berita tidak valid' }), 'application/json; charset=utf-8'); }
+  const allowed = [...previewHosts].some((host) => parsed.hostname === host || parsed.hostname.endsWith(`.${host}`));
+  if (!allowed) return send(response, 403, JSON.stringify({ error: 'Domain berita tidak diizinkan' }), 'application/json; charset=utf-8');
+  if (previewCache.has(source)) return send(response, 200, JSON.stringify(previewCache.get(source)), 'application/json; charset=utf-8');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const result = await fetch(source, { signal: controller.signal, headers: { 'User-Agent': 'SadengInsight/1.0' } });
+    const html = await result.text();
+    const imageMatch = html.match(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]+content=["']([^"']+)["']/i) || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image|twitter:image)["']/i);
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const preview = { image: imageMatch ? new URL(imageMatch[1], source).href : null, title: titleMatch ? titleMatch[1].trim() : parsed.hostname, source };
+    previewCache.set(source, preview);
+    send(response, 200, JSON.stringify(preview), 'application/json; charset=utf-8');
+  } catch (error) {
+    send(response, 200, JSON.stringify({ image: null, title: parsed.hostname, source, error: 'Pratinjau berita tidak tersedia' }), 'application/json; charset=utf-8');
+  } finally { clearTimeout(timeout); }
+}
 
 server.listen(port, () => console.log(`Sadeng Insight berjalan di http://localhost:${port}`));

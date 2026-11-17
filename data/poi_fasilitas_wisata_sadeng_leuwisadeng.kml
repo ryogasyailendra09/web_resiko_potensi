@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>POI Terverifikasi Pasar &amp; Curug - Sadeng &amp; Sekitarnya (Kec. Leuwisadeng)</name>
+    <Placemark>
+      <name>Pasar Rakyat Leuwisadeng (Koridor Pasar Wilayah Sadeng)</name>
+      <description>&lt;b&gt;Kategori:&lt;/b&gt; Pasar Tradisional / Pusat Ekonomi&lt;br/&gt;&lt;b&gt;Wilayah:&lt;/b&gt; Desa Sadeng, Kec. Leuwisadeng, Kab. Bogor 16640&lt;br/&gt;&lt;b&gt;Koordinat:&lt;/b&gt; -6.561362, 106.578328 (Terverifikasi Google Maps Plus Code 6P58CHQH+F84)&lt;br/&gt;&lt;b&gt;Jam Operasional:&lt;/b&gt; Setiap Hari: 06.00 – 17.00 WIB&lt;br/&gt;&lt;b&gt;Catatan Validitas:&lt;/b&gt; 1) Pasar Rakyat Leuwisadeng berada di wilayah Desa Sadeng pada koordinat -6.561362, 106.578328. 2) Sedangkan 'Kp. Sadeng Pasar' secara administratif masuk ke desa tetangga di selatannya, yaitu Desa Babakan Sadeng (Kec. Leuwisadeng).&lt;br/&gt;&lt;b&gt;Sumber:&lt;/b&gt; Google Maps (Place ID: ChIJwXRPLTXZaS4R4sG63xevmxo / Plus Code CHQH+F84) &amp; Perda Kab. Bogor No. 1 Tahun 2024</description>
+      <Point>
+        <coordinates>106.578328,-6.561362,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Curug Rubina (Desa Sibanteng – Perbatasan Timur Desa Sadeng)</name>
+      <description>&lt;b&gt;Kategori:&lt;/b&gt; Wisata Alam Air Terjun (Sekitar Wilayah Kecamatan)&lt;br/&gt;&lt;b&gt;Wilayah:&lt;/b&gt; Desa Sibanteng, Kec. Leuwisadeng, Kab. Bogor 16640 (Batas Timur Desa Sadeng)&lt;br/&gt;&lt;b&gt;Koordinat:&lt;/b&gt; -6.552513, 106.604297 (Terverifikasi Google Maps Plus Code 6P58CJW3+XPV (Berada di Desa Sibanteng, tepat di sebelah timur Desa Sadeng))&lt;br/&gt;&lt;b&gt;Jam Operasional:&lt;/b&gt; Belum tercantum jam operasional resmi&lt;br/&gt;&lt;b&gt;Catatan Validitas:&lt;/b&gt; PENTING: Di dalam batas administratif Desa Sadeng tidak terdapat curug komersial/resmi yang tercatat di database publik. Dua curug resmi di Kecamatan Leuwisadeng berada di desa tetangga: Curug Rubina (Desa Sibanteng, batas timur) dan Curug Wangun Jaya (Desa Wangun Jaya).&lt;br/&gt;&lt;b&gt;Sumber:&lt;/b&gt; Google Maps (Place ID: ChIJawBhTZffaS4RdNTSMh_YKUw / Plus Code CJW3+XPV)</description>
+      <Point>
+        <coordinates>106.604297,-6.552513,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Curug Wangun Jaya (Desa Wangun Jaya, Kec. Leuwisadeng)</name>
+      <description>&lt;b&gt;Kategori:&lt;/b&gt; Wisata Alam Air Terjun (Sekitar Wilayah Kecamatan)&lt;br/&gt;&lt;b&gt;Wilayah:&lt;/b&gt; Desa Wangun Jaya, Kec. Leuwisadeng, Kab. Bogor 16640&lt;br/&gt;&lt;b&gt;Koordinat:&lt;/b&gt; -6.599712, 106.577891 (Terverifikasi Google Maps Plus Code 6P58CH2H+456 (Berada di Desa Wangun Jaya, selatan Kec. Leuwisadeng))&lt;br/&gt;&lt;b&gt;Jam Operasional:&lt;/b&gt; Setiap Hari: 08.00 – 17.00 WIB (Telp: 0812-8416-2265)&lt;br/&gt;&lt;b&gt;Catatan Validitas:&lt;/b&gt; Objek wisata air terjun terpopuler di Kecamatan Leuwisadeng, namun secara administratif berada di Desa Wangun Jaya (±4,3 km selatan pusat Desa Sadeng).&lt;br/&gt;&lt;b&gt;Sumber:&lt;/b&gt; Google Maps (Place ID: ChIJHWrDdVTYaS4Rdhx43ntcqDY / Plus Code CH2H+456)</description>
+      <Point>
+        <coordinates>106.577891,-6.599712,0</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>

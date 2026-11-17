@@ -1,8 +1,11 @@
 const mapElement = document.getElementById('full-map');
 const detailPanel = document.getElementById('detail-panel');
-const layerState = { boundary: true, education: true, government: true, disaster: true, route: false };
-const markerLayers = { education: [], government: [], disaster: [] };
+const layerState = { boundary: true, districtBoundary: true, education: true, government: true, disaster: true, shelter: true, water: true, market: true, health: true, tourism: true, evacuation: true, route: false };
+const markerLayers = { education: [], government: [], disaster: [], shelter: [], water: [], market: [], health: [], tourism: [] };
 let boundaryLayer;
+let districtBoundaryLayer;
+let evacuationLayer;
+let markerCluster;
 let map;
 let routeLayer;
 let routeRequestId = 0;
@@ -16,6 +19,10 @@ function resetDetail() {
 }
 
 const categoryFor = (point) => {
+  if (point.layer === 'titik_rawan_bencana') return 'disaster';
+  if (point.layer === 'titik_pengungsian') return 'shelter';
+  if (point.layer === 'titik_sumber_air_kekeringan') return 'water';
+  if (['market', 'health', 'tourism'].includes(point.layer)) return point.layer;
   const category = (point.category || '').toLowerCase();
   if (category.includes('pendidikan')) return 'education';
   if (category.includes('pemerintahan') || category.includes('koordinasi')) return 'government';
@@ -23,17 +30,31 @@ const categoryFor = (point) => {
 };
 
 const iconFor = (kind) => {
-  const symbol = kind === 'education' ? '✦' : kind === 'disaster' ? '!' : '◆';
+  const symbol = kind === 'education' ? '✦' : kind === 'disaster' ? '!' : kind === 'shelter' ? 'H' : kind === 'water' ? '≈' : kind === 'market' ? 'M' : kind === 'health' ? '+' : kind === 'tourism' ? '★' : '◆';
   return L.divIcon({ className: `map-marker ${kind}`, html: `<span>${symbol}</span>`, iconSize: [30, 30], iconAnchor: [15, 15] });
 };
 
 function renderDetail(point, kind) {
-  const photo = point.photo ? `<img class="detail-photo" src="${point.photo}" alt="${point.name}" loading="lazy">` : '<div class="detail-photo photo-empty"><span>▧</span><small>Foto lokasi belum tersedia</small></div>';
+  const photo = point.photo ? `<a class="detail-photo-link" href="${point.photo}" target="_blank" rel="noreferrer"><img class="detail-photo" src="${point.photo}" alt="${point.name}" loading="lazy"><span>Klik untuk membuka foto ↗</span></a>` : `<div class="detail-photo photo-empty" id="photo-preview"><span>▧</span><small>${point.photoReference ? 'Memuat foto berita...' : 'Foto lokal belum tersedia'}</small>${point.photoReference ? `<a href="${point.photoReference}" target="_blank" rel="noreferrer">Buka berita ↗</a>` : ''}</div>`;
   const source = /^https?:\/\//i.test(point.source || '') ? `<a class="detail-source" href="${point.source}" target="_blank" rel="noreferrer">Buka sumber verifikasi ↗</a>` : `<p class="detail-verification">Verifikasi: ${point.source || 'Belum dicantumkan'}</p>`;
+  const extra = [point.riskLevel ? `Risiko: ${point.riskLevel}` : '', point.capacity ? `Kapasitas: ${point.capacity} orang` : '', point.precision ? `Presisi: ${point.precision}` : '', point.photoStatus ? `Foto: ${point.photoStatus}` : ''].filter(Boolean).join(' · ');
   detailPanel.classList.add('is-open');
   detailPanel.classList.remove('is-collapsed');
   document.querySelector('.map-shell').classList.remove('detail-collapsed');
-  detailPanel.innerHTML = `<button class="detail-close" id="detail-close" aria-label="Tutup detail">×</button>${photo}<div class="detail-content"><span class="detail-tag ${kind}">${kind === 'education' ? 'Pendidikan' : kind === 'disaster' ? 'Risiko bencana' : 'Pemerintahan'}</span><h2>${point.name}</h2><p>${point.description || point.category || 'Informasi lokasi terverifikasi.'}</p><dl><div><dt>Kategori</dt><dd>${point.category || '—'}</dd></div><div><dt>Koordinat</dt><dd>${point.coordinates[1].toFixed(6)}, ${point.coordinates[0].toFixed(6)}</dd></div></dl>${source}</div>`;
+  const labels = { education: 'Pendidikan', disaster: 'Risiko bencana', shelter: 'Pengungsian', water: 'Sumber air', market: 'Pasar', health: 'Kesehatan', tourism: 'Wisata', government: 'Pemerintahan' };
+  detailPanel.innerHTML = `<button class="detail-close" id="detail-close" aria-label="Tutup detail">×</button>${photo}<div class="detail-content"><span class="detail-tag ${kind}">${labels[kind] || 'Tempat sekitar'}</span><h2>${point.name}</h2><p>${point.description || point.category || 'Informasi lokasi terverifikasi.'}</p>${extra ? `<p class="detail-meta">${extra}</p>` : ''}<dl><div><dt>Kategori</dt><dd>${point.category || '—'}</dd></div><div><dt>Koordinat</dt><dd>${point.coordinates[1].toFixed(6)}, ${point.coordinates[0].toFixed(6)}</dd></div></dl>${source}</div>`;
+  if (!point.photo && point.photoReference) loadArticlePhoto(point.photoReference, point.name);
+}
+
+async function loadArticlePhoto(source, name) {
+  const preview = document.getElementById('photo-preview');
+  if (!preview) return;
+  try {
+    const response = await fetch(`/api/article-preview?source=${encodeURIComponent(source)}`);
+    const data = await response.json();
+    if (data.image && document.getElementById('photo-preview') === preview) preview.outerHTML = `<a class="detail-photo-link" href="${source}" target="_blank" rel="noreferrer"><img class="detail-photo" src="${data.image}" alt="${name}" loading="lazy"><span>Foto dari berita · klik untuk membuka sumber ↗</span></a>`;
+    else preview.querySelector('small').textContent = 'Foto berita tidak dapat dimuat';
+  } catch { if (preview.querySelector('small')) preview.querySelector('small').textContent = 'Foto berita tidak dapat dimuat'; }
 }
 
 function haversineKm(from, to) {
@@ -110,34 +131,74 @@ function hideRoute() {
 
 function setLayerVisibility(kind) {
   if (markerLayers[kind]) markerLayers[kind].forEach((marker) => {
-    if (layerState[kind]) marker.addTo(map);
-    else marker.remove();
+    if (layerState[kind]) markerCluster ? markerCluster.addLayer(marker) : marker.addTo(map);
+    else markerCluster ? markerCluster.removeLayer(marker) : marker.remove();
   });
   if (boundaryLayer) {
     if (layerState.boundary) boundaryLayer.addTo(map);
     else boundaryLayer.remove();
+  }
+  if (kind === 'districtBoundary' && districtBoundaryLayer) {
+    if (layerState.districtBoundary) districtBoundaryLayer.addTo(map);
+    else districtBoundaryLayer.remove();
+  }
+  if (kind === 'evacuation' && evacuationLayer) {
+    if (layerState.evacuation) evacuationLayer.addTo(map);
+    else evacuationLayer.remove();
   }
 }
 
 async function start() {
   const response = await fetch('/api/dashboard');
   const data = await response.json();
+  renderNearby(data.nearby || []);
+  const layersToggle = document.getElementById('layers-toggle');
+  const layersPanel = document.querySelector('.map-sidebar');
+  layersToggle.addEventListener('click', () => {
+    const open = layersPanel.classList.toggle('is-open');
+    layersToggle.setAttribute('aria-expanded', String(open));
+    layersToggle.querySelector('span').textContent = open ? 'Tutup lapisan' : 'Lapisan';
+  });
+  // Layer tanpa titik koordinat disembunyikan sampai workbook memiliki data GPS valid.
+  ['water', 'health'].forEach((layer) => {
+    if (!data.spatial.points.some((point) => point.layer === layer || (layer === 'water' && point.layer === 'titik_sumber_air_kekeringan'))) {
+      document.querySelectorAll(`[data-layer="${layer}"]`).forEach((element) => element.closest('.layer-toggle')?.remove());
+      document.querySelectorAll('.map-floating-legend span').forEach((element) => { if (element.textContent.includes(layer === 'water' ? 'Air' : 'Kesehatan')) element.remove(); });
+    }
+  });
+  if (!data.spatial.districtBoundary) {
+    document.querySelectorAll('[data-layer="districtBoundary"]').forEach((element) => element.closest('.layer-toggle')?.remove());
+    document.querySelectorAll('.map-floating-legend span').forEach((element) => { if (element.textContent.includes('Kecamatan')) element.remove(); });
+  }
   const [longitude, latitude] = data.spatial.points[0].coordinates;
   map = L.map(mapElement, { zoomControl: false, scrollWheelZoom: true, touchZoom: true, dragging: true, doubleClickZoom: true, wheelPxPerZoomLevel: 90 }).setView([latitude, longitude], 13);
   L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 }).addTo(map);
+  markerCluster = window.L.markerClusterGroup ? L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: true, disableClusteringAtZoom: 17, maxClusterRadius: 42 }).addTo(map) : null;
   window.sadengMap = map;
   const bounds = [];
   if (data.spatial.boundary) {
     boundaryLayer = L.geoJSON(data.spatial.boundary, { style: { color: '#ff8966', weight: 2, fillColor: '#ff8966', fillOpacity: .12, dashArray: '7 6' } }).addTo(map);
     bounds.push([boundaryLayer.getBounds().getSouth(), boundaryLayer.getBounds().getWest()], [boundaryLayer.getBounds().getNorth(), boundaryLayer.getBounds().getEast()]);
   }
+  if (data.spatial.districtBoundary) {
+    districtBoundaryLayer = L.geoJSON(data.spatial.districtBoundary, { style: { color: '#8bd7ff', weight: 2.5, fillColor: '#8bd7ff', fillOpacity: .05, dashArray: '3 9' } }).addTo(map);
+    bounds.push([districtBoundaryLayer.getBounds().getSouth(), districtBoundaryLayer.getBounds().getWest()], [districtBoundaryLayer.getBounds().getNorth(), districtBoundaryLayer.getBounds().getEast()]);
+  }
+  if (data.spatial.routes?.length) {
+    evacuationLayer = L.featureGroup();
+    data.spatial.routes.forEach((route) => {
+      L.geoJSON({ type: 'Feature', properties: route, geometry: route.geometry }, { style: { color: '#72d3c4', weight: 4, opacity: .9, dashArray: '9 7' } }).bindPopup(`<strong>${route.nama || 'Jalur evakuasi'}</strong><br><small>${route.status_verifikasi_jalur || 'Jalur survei'}</small>`).addTo(evacuationLayer);
+    });
+    evacuationLayer.addTo(map);
+  }
   data.spatial.points.forEach((point) => {
     const kind = categoryFor(point);
     const marker = L.marker([point.coordinates[1], point.coordinates[0]], { icon: iconFor(kind) });
     marker.on('click', () => renderDetail(point, kind));
     markerLayers[kind].push(marker);
-    marker.addTo(map);
+    if (markerCluster) markerCluster.addLayer(marker);
+    else marker.addTo(map);
     bounds.push([point.coordinates[1], point.coordinates[0]]);
   });
   map.fitBounds(bounds, { padding: [40, 40] });
@@ -149,6 +210,14 @@ async function start() {
     if (event.target.checked) showRoute([longitude, latitude]);
     else hideRoute();
   });
+}
+
+function renderNearby(items) {
+  const sidebar = document.querySelector('.map-sidebar');
+  const note = document.createElement('section');
+  note.className = 'nearby-note';
+  note.innerHTML = `<strong>Yang perlu diketahui</strong>${items.map((item) => `<div><span>${item.kind}</span><b>${item.name}</b><small>${item.detail}</small></div>`).join('')}`;
+  sidebar.appendChild(note);
 }
 
 detailPanel.addEventListener('click', (event) => {

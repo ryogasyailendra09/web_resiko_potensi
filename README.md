@@ -35,6 +35,20 @@ Workbook `data/dataset_kkn_desa_sadeng.xlsx` dipakai sebagai sumber kerja lokal 
 
 Angka dan temuan tetap merupakan baseline riset, bukan pengganti verifikasi lapangan.
 
+## Data yang Ditunda
+
+Layer sumber air sengaja disembunyikan dari peta sampai workbook memiliki koordinat GPS titik mata air, sumur, atau tandon. Puskesmas Sadeng Pasar, Puskesmas Leuwisadeng, dan Seureuh Hejo sudah tercatat secara tekstual, tetapi belum memiliki koordinat desimal yang aman untuk dijadikan pin.
+
+Data terbaru sudah memetakan Pasar Rakyat Leuwisadeng, Curug Rubina, dan Curug Wangun Jaya. Keduanya berada di sekitar wilayah administratif Sadeng, bukan seluruhnya di dalam Desa Sadeng; label wilayah pada popup tetap ditampilkan agar tidak menyesatkan.
+
+Boundary Kecamatan Leuwisadeng sudah didukung oleh extractor dan akan tampil sebagai garis biru terpisah ketika polygon resmi berhasil diperoleh. Saat ini sumber Overpass sedang tidak stabil, sehingga toggle Kecamatan disembunyikan dan aplikasi mempertahankan polygon Desa Sadeng lama tanpa membuat batas perkiraan.
+
+## Data yang Ditunda
+
+Layer sumber air sengaja disembunyikan dari peta sampai workbook memiliki koordinat GPS titik mata air, sumur, atau tandon. Data sekitar yang sudah diketahui secara tekstual adalah Sadeng Pasar, Puskesmas Sadeng Pasar, Puskesmas Leuwisadeng, dan wisata Seureuh Hejo, tetapi belum memiliki koordinat yang cukup untuk dijadikan pin.
+
+Curug di sekitar Sadeng belum ditambahkan karena belum ditemukan nama, koordinat, dan sumber resmi yang dapat diverifikasi. Jangan gunakan daftar tempat ini sebagai navigasi presisi sebelum survei atau sumber geospasial resmi dilengkapi.
+
 ## Struktur
 
 - `server.js`: server HTTP, API `/api/dashboard`, dan pembacaan sumber Markdown.

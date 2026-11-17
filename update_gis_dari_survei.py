@@ -3,8 +3,10 @@ import os
 import urllib.request
 import openpyxl
 
-EXCEL_PATH = "form_survei_dan_database_gis_sadeng-v2.xlsx"
-GEOJSON_OUT = "peta_kebencanaan_evakuasi_desa_sadeng_final.geojson"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+EXCEL_PATH = os.path.join(DATA_DIR, "form_survei_dan_database_gis_sadeng-v2.xlsx")
+GEOJSON_OUT = os.path.join(DATA_DIR, "peta_kebencanaan_evakuasi_desa_sadeng_final.geojson")
 
 
 def snap_route_osrm(coords_lon_lat):
@@ -36,7 +38,8 @@ def build_final_geojson():
         lat = float(lat_gps) if lat_gps is not None else float(lat_ref)
         lon = float(lon_gps) if lon_gps is not None else float(lon_ref)
         presisi_final = "Terverifikasi GPS Lapangan" if (lat_gps and lon_gps) else presisi
-        foto_ada = os.path.exists(str(foto_path)) if foto_path else False
+        foto_candidate = os.path.join(BASE_DIR, str(foto_path)) if foto_path and not os.path.isabs(str(foto_path)) else str(foto_path)
+        foto_ada = os.path.exists(foto_candidate) if foto_path else False
 
         features.append({
             "type": "Feature",
@@ -51,7 +54,7 @@ def build_final_geojson():
                 "tingkat_risiko": tingkat,
                 "tanggal_kejadian": str(tgl),
                 "deskripsi_singkat": desk,
-                "foto_lokal": foto_path if foto_ada else None,
+                "foto_lokal": str(foto_path) if foto_ada else None,
                 "status_foto_lokal": "Tersedia" if foto_ada else f"File belum ditemukan di {foto_path}",
                 "foto_referensi_url": url_ref,
                 "sumber_verifikasi": sumber,
@@ -131,6 +134,6 @@ def build_final_geojson():
 
 
 if __name__ == "__main__":
-    os.makedirs("data/photos", exist_ok=True)
-    os.makedirs("data/tracks", exist_ok=True)
+    os.makedirs(os.path.join(DATA_DIR, "photos"), exist_ok=True)
+    os.makedirs(os.path.join(DATA_DIR, "tracks"), exist_ok=True)
     build_final_geojson()
