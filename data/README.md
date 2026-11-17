@@ -49,3 +49,22 @@ Koordinat di atas hanya contoh indikatif dari panel saat ini, bukan klaim titik 
 - Foto lapangan dengan tanggal dan lokasi.
 
 Data geospasial sebaiknya menyebutkan sumber, tanggal pengambilan, dan tingkat ketelitian agar tidak tercampur dengan estimasi dari laporan sekunder.
+
+## Data untuk peta interaktif
+
+Halaman peta khusus tersedia di `/public/map.html`. Agar layer risiko dan foto dapat tampil, tambahkan properti berikut pada feature GeoJSON:
+
+```json
+{
+  "id": "risk_banjir_kp_paku_2023",
+  "nama": "Titik rawan banjir Kp. Paku",
+  "kategori": "Risiko Banjir",
+  "deskripsi": "Luapan sungai saat hujan intensitas tinggi.",
+  "foto_url": "/data/photos/banjir-kp-paku-2023.jpg",
+  "tanggal": "2023-04-24",
+  "tingkat_risiko": "Tinggi",
+  "sumber_verifikasi": "https://contoh-sumber-resmi.id"
+}
+```
+
+Kategori yang dikenali peta: `Risiko Banjir`, `Risiko Longsor`, `Pendidikan`, `Pusat Pemerintahan`, `Kesehatan`, `Pertanian`, dan `Wisata`. Foto sebaiknya tidak memuat wajah atau identitas pribadi tanpa izin; gunakan foto lokasi, fasilitas, atau dokumentasi yang sudah dianonimkan.

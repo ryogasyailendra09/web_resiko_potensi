@@ -2,6 +2,7 @@ import json
 import os
 import urllib.request
 import urllib.parse
+import urllib.error
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
@@ -10,7 +11,9 @@ from xml.dom import minidom
 #         Butuh: pip install geopandas
 # OPSI B: Tarik langsung dari OpenStreetMap Overpass API (tanpa library tambahan)
 # ==============================================================================
-SHP_BIG_PATH = "ADMINISTRASIDESA_AR_25K.shp"  # Ubah path jika file BIG tersedia
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+SHP_BIG_PATH = os.path.join(DATA_DIR, "ADMINISTRASIDESA_AR_25K.shp")  # Ubah path jika file BIG tersedia
 
 
 def ambil_poligon_dari_big(shp_path):
@@ -38,11 +41,24 @@ def ambil_poligon_dari_osm():
     relation(area.kec)["boundary"="administrative"]["name"="Sadeng"];
     out geom;
     """
-    url = "https://overpass-api.de/api/interpreter"
     data = urllib.parse.urlencode({"data": query}).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers={"User-Agent": "KKN-Sadeng-Mapper/1.0"})
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        osm = json.loads(resp.read().decode("utf-8"))
+    endpoints = [
+        "https://overpass-api.de/api/interpreter",
+        "https://overpass.kumi.systems/api/interpreter",
+        "https://overpass.private.coffee/api/interpreter",
+    ]
+    osm = None
+    errors = []
+    for url in endpoints:
+        try:
+            req = urllib.request.Request(url, data=data, headers={"User-Agent": "KKN-Sadeng-Mapper/1.0"})
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                osm = json.loads(resp.read().decode("utf-8"))
+            break
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as error:
+            errors.append(f"{url}: {error}")
+    if osm is None:
+        raise RuntimeError("Semua endpoint Overpass gagal: " + " | ".join(errors))
 
     # Susun segmen way luar (outer) menjadi ring koordinat tertutup
     rings = []
@@ -140,23 +156,32 @@ def ekspor_ke_kml(features, kml_output):
 
 
 if __name__ == "__main__":
+    titik_path = os.path.join(DATA_DIR, "desa_sadeng_leuwisadeng.geojson")
+    output_geojson = os.path.join(DATA_DIR, "desa_sadeng_lengkap_poligon.geojson")
+    output_kml = os.path.join(DATA_DIR, "desa_sadeng_lengkap_poligon.kml")
+
     if os.path.exists(SHP_BIG_PATH):
         print("Membaca poligon resmi dari Shapefile BIG...")
         fitur_poligon = ambil_poligon_dari_big(SHP_BIG_PATH)
     else:
-        print("Shapefile BIG tidak ditemukan lokal; menarik batas dari Overpass API OSM...")
-        fitur_poligon = ambil_poligon_dari_osm()
+        print("Shapefile BIG tidak ditemukan lokal; menarik batas dari endpoint Overpass...")
+        try:
+            fitur_poligon = ambil_poligon_dari_osm()
+        except RuntimeError as error:
+            print(f"Peringatan: {error}")
+            print("Melanjutkan dengan titik terverifikasi tanpa membuat poligon perkiraan.")
+            fitur_poligon = []
 
     # Gabungkan dengan titik fasilitas dari desa_sadeng_leuwisadeng.geojson jika ada
     fitur_gabungan = list(fitur_poligon)
-    if os.path.exists("desa_sadeng_leuwisadeng.geojson"):
-        with open("desa_sadeng_leuwisadeng.geojson", "r", encoding="utf-8") as f:
+    if os.path.exists(titik_path):
+        with open(titik_path, "r", encoding="utf-8") as f:
             fitur_titik = json.load(f).get("features", [])
         fitur_gabungan.extend(fitur_titik)
 
     geojson_lengkap = {"type": "FeatureCollection", "features": fitur_gabungan}
-    with open("desa_sadeng_lengkap_poligon.geojson", "w", encoding="utf-8") as f:
+    with open(output_geojson, "w", encoding="utf-8") as f:
         json.dump(geojson_lengkap, f, ensure_ascii=False, indent=2)
 
-    ekspor_ke_kml(fitur_gabungan, "desa_sadeng_lengkap_poligon.kml")
-    print("Selesai: desa_sadeng_lengkap_poligon.geojson & desa_sadeng_lengkap_poligon.kml")
+    ekspor_ke_kml(fitur_gabungan, output_kml)
+    print(f"Selesai: {output_geojson} & {output_kml}")

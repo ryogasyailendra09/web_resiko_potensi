@@ -6,7 +6,7 @@ const { URL } = require('url');
 const root = __dirname;
 const port = process.env.PORT || 3000;
 const sourcePath = path.join(root, 'data', 'rangkuman_data_riset_kkn_desa_sadeng_kec_leuwisadeng.md');
-const spatialPath = path.join(root, 'data', 'desa_sadeng_leuwisadeng.geojson');
+const spatialPath = path.join(root, 'data', 'desa_sadeng_lengkap_poligon.geojson');
 
 const dashboard = {
   village: 'Desa Sadeng',
@@ -95,9 +95,12 @@ const server = http.createServer((request, response) => {
       category: feature.properties.kategori,
       address: feature.properties.alamat,
       source: feature.properties.sumber_verifikasi,
+      photo: feature.properties.foto_url || feature.properties.photo || null,
+      description: feature.properties.deskripsi || feature.properties.catatan_risiko || null,
       coordinates: feature.geometry.coordinates
     }));
-    return send(response, 200, JSON.stringify({ ...dashboard, spatial: { points, metadata: spatial.metadata }, source: { file: path.basename(sourcePath), characters: markdown.length } }), 'application/json; charset=utf-8');
+    const boundary = spatial.features.find((feature) => ['Polygon', 'MultiPolygon'].includes(feature.geometry?.type));
+    return send(response, 200, JSON.stringify({ ...dashboard, spatial: { points, boundary: boundary || null, metadata: spatial.metadata || {} }, source: { file: path.basename(sourcePath), characters: markdown.length } }), 'application/json; charset=utf-8');
   }
   const requested = url.pathname === '/' ? '/public/index.html' : url.pathname;
   const file = path.normalize(path.join(root, requested));

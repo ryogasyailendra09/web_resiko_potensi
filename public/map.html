@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Peta interaktif fasilitas, risiko, dan potensi Desa Sadeng.">
+  <title>Peta Interaktif | Sadeng Insight</title>
+  <link rel="stylesheet" href="/public/styles.css">
+  <link rel="stylesheet" href="/public/glass.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/public/map.css">
+  <link rel="stylesheet" href="/public/map-overrides.css">
+</head>
+<body class="map-page">
+  <header class="map-topbar">
+    <a class="brand" href="/public/index.html#top"><span class="brand-mark">S</span><span>Sadeng<span class="brand-light">Insight</span></span></a>
+    <div class="map-title"><span class="eyebrow">RUANG EKSPLORASI</span><strong>Peta Desa Sadeng</strong></div>
+    <a class="back-link" href="/public/index.html">← Dashboard</a>
+  </header>
+  <main class="map-shell detail-collapsed">
+    <aside class="map-sidebar">
+      <div class="sidebar-intro"><p class="eyebrow">INTERACTIVE MAP</p><h1>Lihat desa<br><em>dari dekat.</em></h1><p>Pilih lapisan untuk membaca ruang, fasilitas, dan titik perhatian secara visual.</p></div>
+      <div class="layer-panel"><strong>Lapisan informasi</strong><label class="layer-toggle"><input type="checkbox" data-layer="boundary" checked><i class="layer-icon boundary"></i><span><b>Batas Desa</b><small>Wilayah administratif</small></span></label><label class="layer-toggle"><input type="checkbox" data-layer="education" checked><i class="layer-icon education">✦</i><span><b>Pendidikan</b><small>Sekolah & pesantren</small></span></label><label class="layer-toggle"><input type="checkbox" data-layer="government" checked><i class="layer-icon government">◆</i><span><b>Pemerintahan</b><small>Kantor & koordinasi</small></span></label><label class="layer-toggle"><input type="checkbox" data-layer="disaster" checked><i class="layer-icon disaster">!</i><span><b>Risiko bencana</b><small>Banjir & longsor</small></span></label><label class="layer-toggle"><input type="checkbox" data-layer="route"><i class="layer-icon route">↗</i><span><b>Rute IPB Dramaga</b><small>Jarak & estimasi waktu</small></span></label></div>
+      <div class="map-summary"><span class="summary-number" id="location-count">0</span><span><b>lokasi terpetakan</b><small>dari data terverifikasi</small></span></div>
+      <div class="map-note"><span>+</span><p>Geser peta untuk berpindah. Gunakan scroll atau pinch untuk zoom. Klik simbol untuk membuka detail.</p></div>
+    </aside>
+    <section class="map-stage"><div id="full-map" aria-label="Peta interaktif Desa Sadeng"></div><div class="map-floating-legend"><strong>Simbol</strong><span><i class="layer-icon education">✦</i>Pendidikan</span><span><i class="layer-icon government">◆</i>Pemerintahan</span><span><i class="layer-icon disaster">!</i>Risiko</span><span><i class="layer-icon route">A·B</i>Rute</span></div><div class="map-status" id="map-status">Memuat data...</div><div class="route-card" id="route-card" aria-live="polite"></div></section>
+    <aside class="detail-panel is-collapsed" id="detail-panel"><button class="detail-close" id="detail-close" aria-label="Tutup detail">×</button><div class="detail-empty"><span class="detail-orb">+</span><p class="eyebrow">PILIH SATU TITIK</p><h2>Informasi lokasi<br>akan muncul di sini.</h2><p>Klik marker pada peta untuk melihat nama, kategori, sumber, dan foto lokasi.</p></div></aside>
+  </main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/public/map.js"></script>
+</body>
+</html>

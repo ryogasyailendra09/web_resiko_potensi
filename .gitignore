@@ -15,6 +15,7 @@ data/*sensitive*
 data/*rahasia*
 data/*.xlsx
 data/*.xls
+data/*.zip
 
 # Runtime and editor output
 *.log

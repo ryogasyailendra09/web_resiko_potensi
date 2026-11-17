@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Peta Kebencanaan, Foto Lokasi &amp; Jalur Evakuasi - Desa Sadeng (32.01.39.2007)</name>
+    <description>Data terverifikasi titik rawan banjir, longsor, kekeringan, tautan foto lokasi, sumber verifikasi, serta titik pengungsian dan jalur evakuasi Desa Sadeng, Kec. Leuwisadeng, Kab. Bogor.</description>
+    <Style id="styleBencanaTinggi">
+      <IconStyle>
+        <color>ff212b92</color>
+        <scale>1.2</scale>
+      </IconStyle>
+    </Style>
+    <Style id="styleBencanaSedang">
+      <IconStyle>
+        <color>ff0a7d9a</color>
+        <scale>1.1</scale>
+      </IconStyle>
+    </Style>
+    <Style id="stylePengungsian">
+      <IconStyle>
+        <color>ff49841e</color>
+        <scale>1.2</scale>
+      </IconStyle>
+    </Style>
+    <Style id="styleJalurEvakuasi">
+      <LineStyle>
+        <color>ff1e8449</color>
+        <width>3.5</width>
+      </LineStyle>
+    </Style>
+    <Placemark>
+      <name>Koridor Sungai Cimanggung (Cinanggung) – Kampung Paku</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; -6.568013, 106.594234&lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Banjir Bandang / Luapan Sungai&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Tinggi&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; 2023-04-24 s.d. 2023-04-28&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; Hujan berintensitas tinggi memicu luapan Sungai Cimanggung/Cinanggung di Kampung Paku (6 RT terdampak). Banjir bandang merusak puluhan rumah warga, menyebabkan 32 orang luka-luka, dan memaksa 700–1.001 jiwa mengungsi.&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; 1) CNN Indonesia / ANTARA FOTO (28 Apr 2023): https://www.cnnindonesia.com/nasional/20230428142404-20-943094/seribu-warga-terdampak-banjir-bandang-di-leuwisadeng-bogor
+2) Liputan6 (25 Apr 2023): https://www.liputan6.com/news/read/5269658/puluhan-rumah-di-desa-sadeng-bogor-disapu-banjir-bandang-32-orang-terluka
+3) detikNews (24 Apr 2023): https://news.detik.com/berita/d-6688631/banjir-melanda-6-rt-di-kawasan-leuwisadeng-bogor-700-warga-terdampak&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; BPBD Kabupaten Bogor, CNN Indonesia, Liputan6, detikNews&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Jalur Evakuasi: Bergerak menjauhi bantaran Sungai Cimanggung ke arah utara/barat melalui Jl. Raya Paku Sadeng menuju elevasi lebih tinggi.
+Titik Pengungsian: Kantor Desa Sadeng (-6.561262, 106.590328), MI Al Khoeriyah Sadeng (-6.565663, 106.590516), dan rumah kerabat di zona aman.</description>
+      <styleUrl>#styleBencanaTinggi</styleUrl>
+      <Point>
+        <coordinates>106.594234,-6.568013,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Kawasan Tebingan &amp; Perbukitan Lereng 15°–30° (Wilayah Leuwisadeng / Utara Desa Sadeng)</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; -6.553138, 106.576547&lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Tanah Longsor / Gerakan Tanah&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Tinggi&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; 2022-10-13 (dan kerawanan musiman Nov–Apr)&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; Tebingan tergerus longsor akibat hujan deras berkepanjangan di Kecamatan Leuwisadeng. Topografi perbukitan Desa Sadeng memiliki kemiringan lereng 15°–30° dengan curah hujan tahunan 2.200–3.000 mm sehingga rawan longsor tebing jalan dan kebun.&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; Dokumentasi Kejadian PPID Kabupaten Bogor (13 Okt 2022): https://ppid.bogorkab.go.id/index.php?d=30030&amp;page_title=TEBINGAN_DI_GERUS_LONGSOR_DI_KECAMATAN_LEUWISADENG&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; PPID Pemerintah Kabupaten Bogor, InaRISK BNPB (https://inarisk.bnpb.go.id), Perda Kab. Bogor No. 4 Tahun 2025&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Jalur Evakuasi: Menjauhi kaki lereng/tebingan curam menuju jalan poros desa berpermukaan landai.
+Titik Pengungsian: SDN Sukajadi (-6.553138, 106.576547) untuk wilayah Kp. Cikadu/RW 005 atau Kantor Desa Sadeng (-6.561262, 106.590328) untuk wilayah tengah.</description>
+      <styleUrl>#styleBencanaTinggi</styleUrl>
+      <Point>
+        <coordinates>106.576547,-6.553138,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Permukiman Elevasi Atas / Wilayah Leuwisadeng (Sadeng Kolot &amp; Sekitarnya)</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; -6.561262, 106.590328&lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Kekeringan &amp; Krisis Air Bersih&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Sedang&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; 2026-07 (Puncak Kemarau Juli–September)&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; Penurunan debit mata air dan sumur gali dangkal pada permukiman dataran tinggi saat puncak musim kemarau (150 KK terdampak di wilayah Leuwisadeng/Sadeng Kolot), memerlukan suplai rutin 2 tangki air bersih/hari dari BPBD.&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; Dokumentasi Distribusi Air Bersih BPBD (Juli 2026): https://www.beritasatu.com/jabar/3010301/kekeringan-di-bogor-ratusan-warga-sadeng-kolot-kesulitan-air-bersih&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; BPBD Kabupaten Bogor, BeritaSatu&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Tidak memerlukan pengungsian penduduk. Titik kumpul distribusi tandon/tangki air bersih terpusat di Halaman Kantor Desa Sadeng (-6.561262, 106.590328) dan titik tandon RW setempat.</description>
+      <styleUrl>#styleBencanaSedang</styleUrl>
+      <Point>
+        <coordinates>106.590328,-6.561262,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Posko Utama &amp; Titik Pengungsian 1: Kantor Desa Sadeng</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; -6.561262, 106.590328&lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Zona Aman / Titik Pengungsian&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Aman&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; Siaga Darurat&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; Posko Komando Darurat, Pengungsian Utama, &amp; Titik Distribusi Logistik/Air Bersih — ± 215 mdpl (Zona Datar Koridor Jl. Raya Sadeng). Akses kendaraan roda 4 / ambulans / truk tangki BPBD.&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; Verifikasi lapangan &amp; Google Maps Plus Code&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; Google Maps Plus Code 6P58CHQR+F4W &amp; Portal Bestie Pemkab Bogor&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Posko Komando Darurat, Pengungsian Utama, &amp; Titik Distribusi Logistik/Air Bersih</description>
+      <styleUrl>#stylePengungsian</styleUrl>
+      <Point>
+        <coordinates>106.590328,-6.561262,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Titik Evakuasi Sementara 2: MI Al Khoeriyah Sadeng</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; -6.565663, 106.590516&lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Zona Aman / Titik Pengungsian&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Aman&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; Siaga Darurat&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; Titik Kumpul Evakuasi Sementara Warga Kp. Sadeng &amp; Utara Kp. Paku — Zona Permukiman Aman dari Luapan Sungai Cimanggung. Ruang kelas madrasah &amp; halaman terbuka untuk warga mengungsi.&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; Verifikasi lapangan &amp; Google Maps Plus Code&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; Google Maps Plus Code 6P58CHMR+P6J &amp; Profil Desa Sadeng&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Titik Kumpul Evakuasi Sementara Warga Kp. Sadeng &amp; Utara Kp. Paku</description>
+      <styleUrl>#stylePengungsian</styleUrl>
+      <Point>
+        <coordinates>106.590516,-6.565663,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Titik Evakuasi Wilayah Barat Laut 3: SDN Sukajadi (Kp. Cikadu)</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; -6.553138, 106.576547&lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Zona Aman / Titik Pengungsian&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Aman&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; Siaga Darurat&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; Titik Evakuasi Warga RW 005 (Kp. Cikadu) &amp; Sekitarnya — Zona Aman Jauh dari Bantaran Sungai Utama. Ruang kelas sekolah dasar &amp; lapangan sekolah.&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; Verifikasi lapangan &amp; Google Maps Plus Code&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; Google Maps Plus Code 6P58CHWG+PJV &amp; Profil Desa Sadeng&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Titik Evakuasi Warga RW 005 (Kp. Cikadu) &amp; Sekitarnya</description>
+      <styleUrl>#stylePengungsian</styleUrl>
+      <Point>
+        <coordinates>106.576547,-6.553138,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Posko Koordinasi Tingkat Kecamatan: Kantor Kecamatan Leuwisadeng</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; -6.565138, 106.614484&lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Zona Aman / Titik Pengungsian&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Aman&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; Siaga Darurat&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; Posko Logistik Kecamatan, Rujukan Puskesmas &amp; Koordinasi BPBD Kab. Bogor — ± 3 km arah timur dari pusat Desa Sadeng. Jalur provinsi/kabupaten utama untuk mobilisasi bantuan berat.&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; Verifikasi lapangan &amp; Google Maps Plus Code&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; Google Maps Plus Code 6P58CJM7+WQX&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Posko Logistik Kecamatan, Rujukan Puskesmas &amp; Koordinasi BPBD Kab. Bogor</description>
+      <styleUrl>#stylePengungsian</styleUrl>
+      <Point>
+        <coordinates>106.614484,-6.565138,0</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>Jalur Evakuasi 1: Zona Rawan Banjir Kp. Paku → Kantor Desa Sadeng</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; Garis Koridor, &lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Koridor Jalur Evakuasi&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Jalur Aman&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; Siaga Darurat&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; ± 0,95 km (Koridor Jl. Raya Paku Sadeng – Jl. Raya Sadeng) — Rute evakuasi menjauhi luapan Sungai Cimanggung menuju titik aman elevasi atas (via MI Al Khoeriyah ke Kantor Desa Sadeng).&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; Koridor Jalan Poros Desa Sadeng&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; Pemetaan Koridor Jalan Desa Sadeng &amp; BPBD Kab. Bogor&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Jalur Evakuasi 1: Zona Rawan Banjir Kp. Paku → Kantor Desa Sadeng</description>
+      <styleUrl>#styleJalurEvakuasi</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>106.594234,-6.568013,0 106.590516,-6.565663,0 106.590328,-6.561262,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Jalur Evakuasi 2: SDN Sukajadi (Kp. Cikadu) ↔ Kantor Desa Sadeng</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; Garis Koridor, &lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Koridor Jalur Evakuasi&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Jalur Aman&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; Siaga Darurat&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; ± 1,85 km (Poros Jl. Kp. Cikadu – Jl. Raya Sadeng) — Rute penghubung titik evakuasi wilayah barat laut (Kp. Cikadu / RW 005) dengan Posko Utama Kantor Desa Sadeng.&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; Koridor Jalan Poros Desa Sadeng&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; Pemetaan Koridor Jalan Desa Sadeng &amp; BPBD Kab. Bogor&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Jalur Evakuasi 2: SDN Sukajadi (Kp. Cikadu) ↔ Kantor Desa Sadeng</description>
+      <styleUrl>#styleJalurEvakuasi</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>106.576547,-6.553138,0 106.5835,-6.5575,0 106.590328,-6.561262,0</coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>Jalur Logistik &amp; Rujukan Medis: Kantor Desa Sadeng ↔ Kantor Kec. Leuwisadeng</name>
+      <description>&lt;b&gt;1. Koordinat:&lt;/b&gt; Garis Koridor, &lt;br/&gt;&lt;b&gt;2. Kategori Risiko:&lt;/b&gt; Koridor Jalur Evakuasi&lt;br/&gt;&lt;b&gt;3. Tingkat Risiko:&lt;/b&gt; Jalur Aman&lt;br/&gt;&lt;b&gt;4. Tanggal Kejadian:&lt;/b&gt; Siaga Darurat&lt;br/&gt;&lt;b&gt;5. Deskripsi Singkat:&lt;/b&gt; ± 2,85 km (Koridor Utama Kecamatan) — Jalur distribusi bantuan BPBD, ambulans Puskesmas, dan evakuasi lanjutan tingkat kecamatan.&lt;br/&gt;&lt;b&gt;6. Foto Lokasi:&lt;/b&gt; Koridor Jalan Poros Desa Sadeng&lt;br/&gt;&lt;b&gt;7. Sumber Verifikasi:&lt;/b&gt; Pemetaan Koridor Jalan Desa Sadeng &amp; BPBD Kab. Bogor&lt;br/&gt;&lt;b&gt;8. Jalur Evakuasi &amp; Pengungsian:&lt;/b&gt; Jalur Logistik &amp; Rujukan Medis: Kantor Desa Sadeng ↔ Kantor Kec. Leuwisadeng</description>
+      <styleUrl>#styleJalurEvakuasi</styleUrl>
+      <LineString>
+        <tessellate>1</tessellate>
+        <coordinates>106.590328,-6.561262,0 106.6025,-6.5632,0 106.614484,-6.565138,0</coordinates>
+      </LineString>
+    </Placemark>
+  </Document>
+</kml>

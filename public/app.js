@@ -6,6 +6,29 @@ async function loadDashboard() {
   return response.json();
 }
 
+function enableMapGate() {
+  const mapPanel = document.querySelector('.hero-map');
+  const mapLink = document.querySelector('.map-open');
+  const hint = document.querySelector('.map-open-hint');
+  if (!mapPanel || !mapLink) return;
+  const openMap = () => { window.location.href = mapLink.href; };
+  mapLink.addEventListener('click', (event) => {
+    event.preventDefault();
+    hint.textContent = 'Double click sekali lagi untuk masuk ke peta interaktif';
+    window.setTimeout(() => { hint.textContent = ''; }, 2200);
+  });
+  mapLink.addEventListener('dblclick', (event) => { event.preventDefault(); openMap(); });
+  mapPanel.addEventListener('click', (event) => {
+    if (!event.target.closest('.map-open, .leaflet-marker-icon, .leaflet-control, .map-legend')) {
+      hint.textContent = 'Double click peta untuk membuka ruang eksplorasi';
+      window.setTimeout(() => { hint.textContent = ''; }, 2200);
+    }
+  });
+  mapPanel.addEventListener('dblclick', (event) => {
+    if (!event.target.closest('.map-open, .leaflet-marker-icon, .leaflet-control, .map-legend')) openMap();
+  });
+}
+
 const el = (id) => document.getElementById(id);
 
 function render(data) {
@@ -16,6 +39,8 @@ function render(data) {
   el('programs').innerHTML = data.programs.map((item, index) => `<article class="program-item"><span class="program-index">0${index + 1}</span><div><h3>${item.title}</h3><span class="program-type">${item.type}</span></div><p>${item.detail}</p></article>`).join('');
   el('kkn').innerHTML = data.kkn.map((item) => `<article class="timeline-item"><span class="timeline-year">${item.year}</span><h3>${item.title}</h3><p>${item.detail}</p></article>`).join('');
   el('rw-table').innerHTML = `<div class="rw-table-head"><span>Wilayah</span><span>Penduduk</span><span>KK</span><span>Rumah</span></div>${data.rw.map((item) => `<div class="rw-row"><span><b>${item.name}</b><small>${item.area}</small></span><strong>${item.population.toLocaleString('id-ID')}</strong><span>${item.families.toLocaleString('id-ID')}</span><span>${item.homes.toLocaleString('id-ID')}</span></div>`).join('')}`;
+  const maxPopulation = Math.max(...data.rw.map((item) => item.population));
+  el('rw-bars').innerHTML = data.rw.map((item) => `<div class="rw-bar-row"><span>${item.name.replace('RW ', '')}</span><div class="rw-bar-track"><i style="width:${Math.round(item.population / maxPopulation * 100)}%"></i></div><strong>${item.population.toLocaleString('id-ID')}</strong></div>`).join('');
   el('facilities').innerHTML = data.facilities.map((item) => `<article class="facility-card"><span>${item.category}</span><strong>${item.count}</strong><p>${item.detail}</p></article>`).join('');
   initMap(data.spatial);
   el('source-file').textContent = data.source.file;
@@ -27,14 +52,21 @@ function render(data) {
 function initMap(spatial) {
   if (!window.L || !spatial?.points?.length) return;
   const [longitude, latitude] = spatial.points[0].coordinates;
-  const map = L.map('sadeng-map', { zoomControl: false, scrollWheelZoom: false }).setView([latitude, longitude], 13);
+  const map = L.map('sadeng-map', { zoomControl: false, scrollWheelZoom: true, touchZoom: true, dragging: true, doubleClickZoom: true, wheelPxPerZoomLevel: 90 }).setView([latitude, longitude], 13);
+  window.sadengMap = map;
   L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 }).addTo(map);
   const bounds = [];
+  if (spatial.boundary) {
+    const boundary = L.geoJSON(spatial.boundary, { style: { color: '#ff8966', weight: 2, fillColor: '#ff8966', fillOpacity: .12, dashArray: '7 6' } }).addTo(map);
+    bounds.push(...boundary.getBounds().toBBoxString().split(',').length ? [[boundary.getBounds().getSouth(), boundary.getBounds().getWest()], [boundary.getBounds().getNorth(), boundary.getBounds().getEast()]] : []);
+  }
   spatial.points.forEach((point) => {
     const [pointLongitude, pointLatitude] = point.coordinates;
     bounds.push([pointLatitude, pointLongitude]);
-    const marker = L.circleMarker([pointLatitude, pointLongitude], { radius: 7, color: '#ff8966', weight: 2, fillColor: '#f2c56f', fillOpacity: .95 });
+    const category = point.category.toLowerCase();
+    const symbol = category.includes('pendidikan') ? 'education' : category.includes('pemerintahan') ? 'government' : 'coordination';
+    const marker = L.marker([pointLatitude, pointLongitude], { icon: L.divIcon({ className: `map-marker ${symbol}`, html: `<span>${symbol === 'education' ? '✦' : symbol === 'government' ? '◆' : '●'}</span>`, iconSize: [26, 26], iconAnchor: [13, 13] }) });
     marker.bindPopup(`<strong>${point.name}</strong><br><small>${point.category}</small><br><small>${point.address || ''}</small>`).addTo(map);
   });
   el('map-point-count').textContent = spatial.points.length;
@@ -43,4 +75,5 @@ function initMap(spatial) {
 
 function renderSources(sources) { el('sources').innerHTML = sources.map((source) => `<div class="source-item"><span>${source.group}</span><a href="${source.url}" target="_blank" rel="noreferrer">${source.name} <b class="source-arrow">↗</b></a></div>`).join('') || '<p class="body-copy">Sumber tidak ditemukan.</p>'; }
 
+enableMapGate();
 loadDashboard().then(render).catch((error) => { document.querySelector('main').innerHTML = `<section class="section-wrap" style="padding:100px 0"><h1>Data belum siap</h1><p>${error.message}</p></section>`; });
