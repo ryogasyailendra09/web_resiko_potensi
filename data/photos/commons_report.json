@@ -1,0 +1,77 @@
+{
+  "BENCANA_01_BANJIR_KP_PAKU": {
+    "nama": "Koridor Sungai Cimanggung (Cinanggung) – Kampung Paku",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "BENCANA_02_LONGSOR_LEUWISADENG": {
+    "nama": "Kawasan Tebingan & Lereng 15°–30° (Wilayah Leuwisadeng / Kp. Cikadu RW 005)",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "BENCANA_03_KEKERINGAN_MUSIMAN": {
+    "nama": "Permukiman Elevasi Atas / Zona Krisis Air Bersih (Posko Desa Sadeng)",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "EVAC_01_KANTOR_DESA": {
+    "nama": "Posko Utama & Titik Pengungsian 1: Kantor Desa Sadeng",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "EVAC_02_MI_ALKHOERIYAH": {
+    "nama": "Titik Evakuasi Sementara 2: MI Al Khoeriyah Sadeng",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "EVAC_03_SDN_SUKAJADI": {
+    "nama": "Titik Evakuasi Wilayah Barat Laut 3: SDN Sukajadi (Kp. Cikadu)",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "EVAC_04_KEC_LEUWISADENG": {
+    "nama": "Posko Koordinasi Tingkat Kecamatan: Kantor Kecamatan Leuwisadeng",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "POI_01_PASAR_RAKYAT_LEUWISADENG": {
+    "nama": "Pasar Rakyat Leuwisadeng (Koridor Pasar Wilayah Sadeng)",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "POI_05_CURUG_RUBINA_SIBANTENG": {
+    "nama": "Curug Rubina (Desa Sibanteng – Perbatasan Timur Desa Sadeng)",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "POI_06_CURUG_WANGUN_JAYA": {
+    "nama": "Curug Wangun Jaya (Desa Wangun Jaya, Kec. Leuwisadeng)",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "center_kantor_desa_sadeng": {
+    "nama": "Kantor Desa Sadeng (Titik Pusat Administrasi Desa)",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "edu_yanuhi_kp_paku": {
+    "nama": "Yayasan Nurul Hidayah Pusat (YANUHI) / Pesantren Nurul Hidayah Al Bakriyah",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "edu_mi_alkhoeriyah": {
+    "nama": "MI Al Khoeriyah Sadeng",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "edu_sdn_sukajadi_cikadu": {
+    "nama": "SDN Sukajadi (Wilayah Kp. Cikadu / RW 005)",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  },
+  "gov_kecamatan_leuwisadeng": {
+    "nama": "Kantor Kecamatan Leuwisadeng (Titik Koordinasi Tingkat Kecamatan)",
+    "jumlah_kandidat": 0,
+    "kandidat": []
+  }
+}
