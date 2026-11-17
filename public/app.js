@@ -11,18 +11,21 @@ function enableMapGate() {
   const mapLink = document.querySelector('.map-open');
   const hint = document.querySelector('.map-open-hint');
   if (!mapPanel || !mapLink) return;
+  const say = (text) => {
+    if (!hint) return;
+    hint.textContent = text;
+    window.setTimeout(() => { hint.textContent = ''; }, 2200);
+  };
   const openMap = () => { window.location.href = mapLink.href; };
   mapLink.addEventListener('click', (event) => {
+    // Layar sentuh tidak punya double click yang nyaman: satu tap langsung membuka peta.
+    if (window.matchMedia('(pointer: coarse)').matches) return;
     event.preventDefault();
-    hint.textContent = 'Double click sekali lagi untuk masuk ke peta interaktif';
-    window.setTimeout(() => { hint.textContent = ''; }, 2200);
+    say('Double click sekali lagi untuk masuk ke peta interaktif');
   });
   mapLink.addEventListener('dblclick', (event) => { event.preventDefault(); openMap(); });
   mapPanel.addEventListener('click', (event) => {
-    if (!event.target.closest('.map-open, .leaflet-marker-icon, .leaflet-control, .map-legend')) {
-      hint.textContent = 'Double click peta untuk membuka ruang eksplorasi';
-      window.setTimeout(() => { hint.textContent = ''; }, 2200);
-    }
+    if (!event.target.closest('.map-open, .leaflet-marker-icon, .leaflet-control, .map-legend')) say('Double click peta untuk membuka ruang eksplorasi');
   });
   mapPanel.addEventListener('dblclick', (event) => {
     if (!event.target.closest('.map-open, .leaflet-marker-icon, .leaflet-control, .map-legend')) openMap();
@@ -44,13 +47,15 @@ function render(data) {
   el('facilities').innerHTML = data.facilities.map((item) => `<article class="facility-card"><span>${item.category}</span><strong>${item.count}</strong><p>${item.detail}</p></article>`).join('');
   initMap(data.spatial);
   el('source-file').textContent = data.source.file;
-  el('source-count').textContent = `${data.sources.length} sumber terindeks · ${data.source.characters.toLocaleString('id-ID')} karakter`; 
+  el('source-count').textContent = `${data.sources.length} sumber terindeks · ${data.source.characters.toLocaleString('id-ID')} karakter`;
   renderSources(data.sources);
   el('source-filter').addEventListener('input', (event) => { const query = event.target.value.toLowerCase(); renderSources(data.sources.filter((source) => `${source.group} ${source.name}`.toLowerCase().includes(query))); });
 }
 
-function initMap(spatial) {
-  if (!window.L || !spatial?.points?.length) return;
+function initMap(spatialAll) {
+  // Peta hero hanya menampilkan titik dasar (fasilitas/pemerintahan); layer lain ada di peta eksplorasi.
+  const spatial = { ...spatialAll, points: (spatialAll?.points || []).filter((point) => point.layer === 'fasilitas') };
+  if (!window.L || !spatial.points.length) return;
   const [longitude, latitude] = spatial.points[0].coordinates;
   const map = L.map('sadeng-map', { zoomControl: false, scrollWheelZoom: true, touchZoom: true, dragging: true, doubleClickZoom: true, wheelPxPerZoomLevel: 90 }).setView([latitude, longitude], 13);
   window.sadengMap = map;
@@ -59,18 +64,19 @@ function initMap(spatial) {
   const bounds = [];
   if (spatial.boundary) {
     const boundary = L.geoJSON(spatial.boundary, { style: { color: '#ff8966', weight: 2, fillColor: '#ff8966', fillOpacity: .12, dashArray: '7 6' } }).addTo(map);
-    bounds.push(...boundary.getBounds().toBBoxString().split(',').length ? [[boundary.getBounds().getSouth(), boundary.getBounds().getWest()], [boundary.getBounds().getNorth(), boundary.getBounds().getEast()]] : []);
+    const b = boundary.getBounds();
+    bounds.push([b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]);
   }
   spatial.points.forEach((point) => {
     const [pointLongitude, pointLatitude] = point.coordinates;
     bounds.push([pointLatitude, pointLongitude]);
-    const category = point.category.toLowerCase();
+    const category = (point.category || '').toLowerCase();
     const symbol = category.includes('pendidikan') ? 'education' : category.includes('pemerintahan') ? 'government' : 'coordination';
     const marker = L.marker([pointLatitude, pointLongitude], { icon: L.divIcon({ className: `map-marker ${symbol}`, html: `<span>${symbol === 'education' ? '✦' : symbol === 'government' ? '◆' : '●'}</span>`, iconSize: [26, 26], iconAnchor: [13, 13] }) });
     marker.bindPopup(`<strong>${point.name}</strong><br><small>${point.category}</small><br><small>${point.address || ''}</small>`).addTo(map);
   });
   el('map-point-count').textContent = spatial.points.length;
-  map.fitBounds(bounds, { padding: [28, 28] });
+  if (bounds.length) map.fitBounds(bounds, { padding: [28, 28] });
 }
 
 function renderSources(sources) { el('sources').innerHTML = sources.map((source) => `<div class="source-item"><span>${source.group}</span><a href="${source.url}" target="_blank" rel="noreferrer">${source.name} <b class="source-arrow">↗</b></a></div>`).join('') || '<p class="body-copy">Sumber tidak ditemukan.</p>'; }

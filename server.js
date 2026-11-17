@@ -9,6 +9,9 @@ const sourcePath = path.join(root, 'data', 'rangkuman_data_riset_kkn_desa_sadeng
 const spatialPath = path.join(root, 'data', 'desa_sadeng_lengkap_poligon.geojson');
 const surveySpatialPath = path.join(root, 'data', 'peta_kebencanaan_evakuasi_desa_sadeng_final.geojson');
 const nearbySpatialPath = path.join(root, 'data', 'poi_fasilitas_wisata_sadeng_leuwisadeng.geojson');
+const photosDir = path.join(root, 'data', 'photos') + path.sep;
+// Hanya folder ini yang boleh diakses publik (data/Bogor.zip, .xlsx, .env, server.js TIDAK ikut).
+const staticDirs = [path.join(root, 'public') + path.sep, photosDir];
 const previewCache = new Map();
 const previewHosts = new Set(['cnnindonesia.com', 'liputan6.com', 'detik.com', 'ppid.bogorkab.go.id', 'beritasatu.com']);
 
@@ -88,77 +91,150 @@ const dashboard = {
   ]
 };
 
-const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8' };
+const mime = {
+  '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8', '.geojson': 'application/geo+json; charset=utf-8',
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml'
+};
+const JSON_TYPE = 'application/json; charset=utf-8';
 
 function send(response, status, body, type = 'text/plain; charset=utf-8') {
-  response.writeHead(status, { 'Content-Type': type, 'Cache-Control': 'no-cache' });
+  response.writeHead(status, { 'Content-Type': type, 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff' });
   response.end(body);
 }
 
+function readJson(file, fallback) {
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); }
+  catch (error) { console.warn(`Gagal membaca ${path.basename(file)}: ${error.message}`); return fallback; }
+}
+
+function resolveStatic(pathname) {
+  let decoded;
+  try { decoded = decodeURIComponent(pathname); } catch { return null; }
+  if (decoded.includes('\0')) return null;
+  const file = path.resolve(root, '.' + (decoded === '/' ? '/public/index.html' : decoded));
+  if (!staticDirs.some((dir) => file.startsWith(dir))) return null;
+  if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) return null;
+  return file;
+}
+
+// Foto lokal (relatif terhadap root proyek) diubah jadi URL web, hanya bila filenya benar-benar ada di data/photos.
+function photoUrl(properties) {
+  const value = properties.foto_lokal || properties.foto_url || properties.photo;
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) return value;
+  const rel = String(value).replace(/^\/+/, '');
+  const abs = path.resolve(root, rel);
+  if (!abs.startsWith(photosDir) || !fs.existsSync(abs)) return null;
+  return '/' + rel.replace(/\\/g, '/');
+}
+
+function buildDashboard() {
+  let markdownLength = 0;
+  try { markdownLength = fs.readFileSync(sourcePath, 'utf8').length; } catch (error) { console.warn(`Sumber markdown tidak terbaca: ${error.message}`); }
+  const baseSpatial = readJson(spatialPath, { features: [], metadata: {} });
+  const surveySpatial = readJson(surveySpatialPath, { features: [] });
+  const nearbySpatial = readJson(nearbySpatialPath, { features: [] });
+  const features = [...(baseSpatial.features || []), ...(surveySpatial.features || []), ...(nearbySpatial.features || [])];
+
+  const points = features.filter((f) => f.geometry?.type === 'Point').map((feature) => {
+    const properties = feature.properties || {};
+    const layer = properties.layer || 'fasilitas';
+    const rawCategory = `${properties.kategori || ''} ${properties.nama || ''}`.toLowerCase();
+    const nearbyKind = properties.layer ? null
+      : rawCategory.includes('pasar') ? 'market'
+      : rawCategory.includes('puskesmas') ? 'health'
+      : rawCategory.includes('curug') || rawCategory.includes('wisata') ? 'tourism' : null;
+    return {
+      id: properties.id,
+      layer: nearbyKind || layer,
+      name: properties.nama,
+      category: properties.kategori || properties.kategori_risiko || properties.layer,
+      riskLevel: properties.tingkat_risiko || null,
+      address: properties.alamat,
+      source: properties.sumber_verifikasi,
+      photo: photoUrl(properties),
+      photoReference: properties.foto_referensi_url || null,
+      description: properties.deskripsi || properties.deskripsi_singkat || properties.catatan_risiko || properties.fungsi || null,
+      capacity: properties.kapasitas_maksimal_orang || null,
+      photoStatus: properties.status_foto_lokal || null,
+      precision: properties.presisi_koordinat || null,
+      coordinates: feature.geometry.coordinates
+    };
+  });
+
+  const boundaries = features.filter((f) => ['Polygon', 'MultiPolygon'].includes(f.geometry?.type));
+  const districtBoundary = boundaries.find((f) => f.properties?.id === 'boundary_kecamatan_leuwisadeng') || null;
+  const boundary = boundaries.find((f) => f.properties?.id === 'boundary_desa_sadeng') || boundaries.find((f) => f !== districtBoundary) || null;
+  const routes = features.filter((f) => f.geometry?.type === 'LineString').map((f) => ({ ...f.properties, geometry: f.geometry }));
+
+  return {
+    ...dashboard,
+    spatial: { points, routes, boundary, districtBoundary, metadata: baseSpatial.metadata || {} },
+    source: { file: path.basename(sourcePath), characters: markdownLength }
+  };
+}
+
+function handle(request, response) {
+  const url = new URL(request.url, `http://${request.headers.host || 'localhost'}`);
+  if (url.pathname === '/api/dashboard') return send(response, 200, JSON.stringify(buildDashboard()), JSON_TYPE);
+  if (url.pathname === '/api/article-preview') return articlePreview(url.searchParams.get('source'), response);
+  const file = resolveStatic(url.pathname);
+  if (!file) return send(response, 404, 'Not found');
+  send(response, 200, fs.readFileSync(file), mime[path.extname(file).toLowerCase()] || 'application/octet-stream');
+}
+
 const server = http.createServer((request, response) => {
-  const url = new URL(request.url, `http://${request.headers.host}`);
-  if (url.pathname === '/api/dashboard') {
-    const markdown = fs.readFileSync(sourcePath, 'utf8');
-    const baseSpatial = JSON.parse(fs.readFileSync(spatialPath, 'utf8'));
-    const surveySpatial = fs.existsSync(surveySpatialPath) ? JSON.parse(fs.readFileSync(surveySpatialPath, 'utf8')) : { features: [] };
-    const nearbySpatial = fs.existsSync(nearbySpatialPath) ? JSON.parse(fs.readFileSync(nearbySpatialPath, 'utf8')) : { features: [] };
-    const features = [...baseSpatial.features, ...surveySpatial.features, ...nearbySpatial.features];
-    const points = features.filter((feature) => feature.geometry?.type === 'Point').map((feature) => {
-      const properties = feature.properties || {};
-      const layer = properties.layer || 'fasilitas';
-      const rawCategory = `${properties.kategori || ''} ${properties.nama || ''}`.toLowerCase();
-      const nearbyKind = rawCategory.includes('pasar') ? 'market' : rawCategory.includes('puskesmas') ? 'health' : rawCategory.includes('curug') || rawCategory.includes('wisata') ? 'tourism' : null;
-      return {
-        id: properties.id,
-        layer: nearbyKind || layer,
-        name: properties.nama,
-        category: properties.kategori || properties.kategori_risiko || properties.layer,
-        riskLevel: properties.tingkat_risiko || null,
-        address: properties.alamat,
-        source: properties.sumber_verifikasi,
-        photo: properties.foto_lokal || properties.foto_url || properties.photo || null,
-        photoReference: properties.foto_referensi_url || null,
-        description: properties.deskripsi || properties.deskripsi_singkat || properties.catatan_risiko || properties.fungsi || null,
-        capacity: properties.kapasitas_maksimal_orang || null,
-        photoStatus: properties.status_foto_lokal || null,
-        precision: properties.presisi_koordinat || null,
-        coordinates: feature.geometry.coordinates
-      };
-    });
-    const boundaries = features.filter((feature) => ['Polygon', 'MultiPolygon'].includes(feature.geometry?.type));
-    const boundary = boundaries.find((feature) => feature.properties?.id === 'boundary_desa_sadeng') || boundaries[0];
-    const districtBoundary = boundaries.find((feature) => feature.properties?.id === 'boundary_kecamatan_leuwisadeng') || null;
-    const routes = features.filter((feature) => feature.geometry?.type === 'LineString').map((feature) => ({ ...feature.properties, geometry: feature.geometry }));
-    return send(response, 200, JSON.stringify({ ...dashboard, spatial: { points, routes, boundary: boundary || null, districtBoundary, metadata: baseSpatial.metadata || {} }, source: { file: path.basename(sourcePath), characters: markdown.length } }), 'application/json; charset=utf-8');
+  try {
+    const result = handle(request, response);
+    if (result && typeof result.catch === 'function') result.catch((error) => { console.error(error); if (!response.headersSent) send(response, 500, JSON.stringify({ error: 'Kesalahan server' }), JSON_TYPE); });
+  } catch (error) {
+    console.error(error);
+    if (!response.headersSent) send(response, 500, JSON.stringify({ error: 'Kesalahan server' }), JSON_TYPE);
   }
-  if (url.pathname === '/api/article-preview') {
-    return articlePreview(url.searchParams.get('source'), response);
-  }
-  const requested = url.pathname === '/' ? '/public/index.html' : url.pathname;
-  const file = path.normalize(path.join(root, requested));
-  if (!file.startsWith(root) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return send(response, 404, 'Not found');
-  send(response, 200, fs.readFileSync(file), mime[path.extname(file)] || 'application/octet-stream');
 });
+
+const isAllowedHost = (host) => [...previewHosts].some((h) => host === h || host.endsWith(`.${h}`));
+
+// Ikuti redirect secara manual agar setiap hop divalidasi (cegah SSRF lewat redirect).
+async function fetchAllowed(source, signal) {
+  let current = source;
+  for (let hop = 0; hop <= 3; hop += 1) {
+    const target = new URL(current);
+    if (!['http:', 'https:'].includes(target.protocol) || !isAllowedHost(target.hostname)) throw new Error('Domain tidak diizinkan');
+    const result = await fetch(current, { signal, redirect: 'manual', headers: { 'User-Agent': 'SadengInsight/1.0' } });
+    const location = result.headers.get('location');
+    if (result.status >= 300 && result.status < 400 && location) { current = new URL(location, current).href; continue; }
+    return { result, finalUrl: current };
+  }
+  throw new Error('Terlalu banyak redirect');
+}
 
 async function articlePreview(source, response) {
   let parsed;
-  try { parsed = new URL(source); } catch { return send(response, 400, JSON.stringify({ error: 'Sumber berita tidak valid' }), 'application/json; charset=utf-8'); }
-  const allowed = [...previewHosts].some((host) => parsed.hostname === host || parsed.hostname.endsWith(`.${host}`));
-  if (!allowed) return send(response, 403, JSON.stringify({ error: 'Domain berita tidak diizinkan' }), 'application/json; charset=utf-8');
-  if (previewCache.has(source)) return send(response, 200, JSON.stringify(previewCache.get(source)), 'application/json; charset=utf-8');
+  try { parsed = new URL(source); } catch { return send(response, 400, JSON.stringify({ error: 'Sumber berita tidak valid' }), JSON_TYPE); }
+  if (!['http:', 'https:'].includes(parsed.protocol) || !isAllowedHost(parsed.hostname)) return send(response, 403, JSON.stringify({ error: 'Domain berita tidak diizinkan' }), JSON_TYPE);
+  if (previewCache.has(source)) return send(response, 200, JSON.stringify(previewCache.get(source)), JSON_TYPE);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
   try {
-    const result = await fetch(source, { signal: controller.signal, headers: { 'User-Agent': 'SadengInsight/1.0' } });
-    const html = await result.text();
-    const imageMatch = html.match(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]+content=["']([^"']+)["']/i) || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image|twitter:image)["']/i);
+    const { result, finalUrl } = await fetchAllowed(source, controller.signal);
+    const html = (await result.text()).slice(0, 300000);
+    const imageMatch = html.match(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image|twitter:image)["']/i);
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    const preview = { image: imageMatch ? new URL(imageMatch[1], source).href : null, title: titleMatch ? titleMatch[1].trim() : parsed.hostname, source };
+    let image = null;
+    if (imageMatch) {
+      try { const candidate = new URL(imageMatch[1], finalUrl); if (['http:', 'https:'].includes(candidate.protocol)) image = candidate.href; } catch { /* abaikan */ }
+    }
+    const preview = { image, title: titleMatch ? titleMatch[1].trim() : parsed.hostname, source };
+    if (previewCache.size > 200) previewCache.clear();
     previewCache.set(source, preview);
-    send(response, 200, JSON.stringify(preview), 'application/json; charset=utf-8');
+    send(response, 200, JSON.stringify(preview), JSON_TYPE);
   } catch (error) {
-    send(response, 200, JSON.stringify({ image: null, title: parsed.hostname, source, error: 'Pratinjau berita tidak tersedia' }), 'application/json; charset=utf-8');
+    send(response, 200, JSON.stringify({ image: null, title: parsed.hostname, source, error: 'Pratinjau berita tidak tersedia' }), JSON_TYPE);
   } finally { clearTimeout(timeout); }
 }
 
+process.on('unhandledRejection', (reason) => console.error('Unhandled rejection:', reason));
 server.listen(port, () => console.log(`Sadeng Insight berjalan di http://localhost:${port}`));

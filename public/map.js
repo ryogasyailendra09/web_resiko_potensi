@@ -11,6 +11,8 @@ let routeLayer;
 let routeRequestId = 0;
 const ipbDramaga = [106.7247, -6.5586];
 
+const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
 function resetDetail() {
   detailPanel.classList.remove('is-open');
   detailPanel.classList.add('is-collapsed');
@@ -35,14 +37,19 @@ const iconFor = (kind) => {
 };
 
 function renderDetail(point, kind) {
-  const photo = point.photo ? `<a class="detail-photo-link" href="${point.photo}" target="_blank" rel="noreferrer"><img class="detail-photo" src="${point.photo}" alt="${point.name}" loading="lazy"><span>Klik untuk membuka foto ↗</span></a>` : `<div class="detail-photo photo-empty" id="photo-preview"><span>▧</span><small>${point.photoReference ? 'Memuat foto berita...' : 'Foto lokal belum tersedia'}</small>${point.photoReference ? `<a href="${point.photoReference}" target="_blank" rel="noreferrer">Buka berita ↗</a>` : ''}</div>`;
-  const source = /^https?:\/\//i.test(point.source || '') ? `<a class="detail-source" href="${point.source}" target="_blank" rel="noreferrer">Buka sumber verifikasi ↗</a>` : `<p class="detail-verification">Verifikasi: ${point.source || 'Belum dicantumkan'}</p>`;
+  const name = esc(point.name);
+  const photo = point.photo
+    ? `<a class="detail-photo-link" href="${esc(point.photo)}" target="_blank" rel="noreferrer"><img class="detail-photo" src="${esc(point.photo)}" alt="${name}" loading="lazy"><span>Klik untuk membuka foto ↗</span></a>`
+    : `<div class="detail-photo photo-empty" id="photo-preview"><span>▧</span><small>${point.photoReference ? 'Memuat foto berita...' : 'Foto lokal belum tersedia'}</small>${point.photoReference ? `<a href="${esc(point.photoReference)}" target="_blank" rel="noreferrer">Buka berita ↗</a>` : ''}</div>`;
+  const source = /^https?:\/\//i.test(point.source || '')
+    ? `<a class="detail-source" href="${esc(point.source)}" target="_blank" rel="noreferrer">Buka sumber verifikasi ↗</a>`
+    : `<p class="detail-verification">Verifikasi: ${esc(point.source || 'Belum dicantumkan')}</p>`;
   const extra = [point.riskLevel ? `Risiko: ${point.riskLevel}` : '', point.capacity ? `Kapasitas: ${point.capacity} orang` : '', point.precision ? `Presisi: ${point.precision}` : '', point.photoStatus ? `Foto: ${point.photoStatus}` : ''].filter(Boolean).join(' · ');
   detailPanel.classList.add('is-open');
   detailPanel.classList.remove('is-collapsed');
   document.querySelector('.map-shell').classList.remove('detail-collapsed');
   const labels = { education: 'Pendidikan', disaster: 'Risiko bencana', shelter: 'Pengungsian', water: 'Sumber air', market: 'Pasar', health: 'Kesehatan', tourism: 'Wisata', government: 'Pemerintahan' };
-  detailPanel.innerHTML = `<button class="detail-close" id="detail-close" aria-label="Tutup detail">×</button>${photo}<div class="detail-content"><span class="detail-tag ${kind}">${labels[kind] || 'Tempat sekitar'}</span><h2>${point.name}</h2><p>${point.description || point.category || 'Informasi lokasi terverifikasi.'}</p>${extra ? `<p class="detail-meta">${extra}</p>` : ''}<dl><div><dt>Kategori</dt><dd>${point.category || '—'}</dd></div><div><dt>Koordinat</dt><dd>${point.coordinates[1].toFixed(6)}, ${point.coordinates[0].toFixed(6)}</dd></div></dl>${source}</div>`;
+  detailPanel.innerHTML = `<button class="detail-close" id="detail-close" aria-label="Tutup detail">×</button>${photo}<div class="detail-content"><span class="detail-tag ${esc(kind)}">${esc(labels[kind] || 'Tempat sekitar')}</span><h2>${name}</h2><p>${esc(point.description || point.category || 'Informasi lokasi terverifikasi.')}</p>${extra ? `<p class="detail-meta">${esc(extra)}</p>` : ''}<dl><div><dt>Kategori</dt><dd>${esc(point.category || '—')}</dd></div><div><dt>Koordinat</dt><dd>${point.coordinates[1].toFixed(6)}, ${point.coordinates[0].toFixed(6)}</dd></div></dl>${source}</div>`;
   if (!point.photo && point.photoReference) loadArticlePhoto(point.photoReference, point.name);
 }
 
@@ -52,8 +59,11 @@ async function loadArticlePhoto(source, name) {
   try {
     const response = await fetch(`/api/article-preview?source=${encodeURIComponent(source)}`);
     const data = await response.json();
-    if (data.image && document.getElementById('photo-preview') === preview) preview.outerHTML = `<a class="detail-photo-link" href="${source}" target="_blank" rel="noreferrer"><img class="detail-photo" src="${data.image}" alt="${name}" loading="lazy"><span>Foto dari berita · klik untuk membuka sumber ↗</span></a>`;
-    else preview.querySelector('small').textContent = 'Foto berita tidak dapat dimuat';
+    if (data.image && document.getElementById('photo-preview') === preview) {
+      preview.outerHTML = `<a class="detail-photo-link" href="${esc(source)}" target="_blank" rel="noreferrer"><img class="detail-photo" src="${esc(data.image)}" alt="${esc(name)}" loading="lazy"><span>Foto dari berita · klik untuk membuka sumber ↗</span></a>`;
+    } else if (preview.querySelector('small')) {
+      preview.querySelector('small').textContent = 'Foto berita tidak dapat dimuat';
+    }
   } catch { if (preview.querySelector('small')) preview.querySelector('small').textContent = 'Foto berita tidak dapat dimuat'; }
 }
 
@@ -69,9 +79,9 @@ async function showRoute(destination) {
   const requestId = ++routeRequestId;
   if (routeLayer) { routeLayer.remove(); routeLayer = null; }
   const routeCard = document.getElementById('route-card');
-    const straightLine = haversineKm(ipbDramaga, destination);
-    drawFallbackRoute(destination);
-    routeCard.innerHTML = `<b>Rute IPB Dramaga → Desa Sadeng</b><strong>±${(straightLine * 1.25).toFixed(1)} km</strong><small>±${Math.round(straightLine * 1.25 / 25 * 60)} menit · menunggu geometri jalan</small>`;
+  const straightLine = haversineKm(ipbDramaga, destination);
+  drawFallbackRoute(destination);
+  routeCard.innerHTML = `<b>Rute IPB Dramaga → Desa Sadeng</b><strong>±${(straightLine * 1.25).toFixed(1)} km</strong><small>±${Math.round(straightLine * 1.25 / 25 * 60)} menit · menunggu geometri jalan</small>`;
   routeCard.classList.add('is-visible');
   let timeoutId;
   try {
@@ -86,7 +96,7 @@ async function showRoute(destination) {
     if (!result.routes?.length) throw new Error('Rute tidak ditemukan');
     if (requestId !== routeRequestId || !layerState.route) return;
     const route = result.routes[0];
-    routeLayer.remove();
+    if (routeLayer) routeLayer.remove();
     routeLayer = L.featureGroup().addTo(map);
     L.geoJSON({ type: 'Feature', geometry: route.geometry }, { style: { color: '#07100f', weight: 10, opacity: .85 } }).addTo(routeLayer);
     L.geoJSON({ type: 'Feature', geometry: route.geometry }, { style: { color: '#8bd7ff', weight: 5, opacity: 1 } }).addTo(routeLayer);
@@ -96,7 +106,6 @@ async function showRoute(destination) {
   } catch (error) {
     window.clearTimeout(timeoutId);
     if (requestId !== routeRequestId || !layerState.route) return;
-    const straightLine = haversineKm(ipbDramaga, destination);
     if (routeLayer) routeLayer.remove();
     drawFallbackRoute(destination);
     routeCard.innerHTML = `<b>IPB Dramaga → Desa Sadeng</b><strong>±${(straightLine * 1.25).toFixed(1)} km</strong><small>±${Math.round(straightLine * 1.25 / 25 * 60)} menit · estimasi koridor, rute detail tidak tersedia</small>`;
@@ -134,7 +143,7 @@ function setLayerVisibility(kind) {
     if (layerState[kind]) markerCluster ? markerCluster.addLayer(marker) : marker.addTo(map);
     else markerCluster ? markerCluster.removeLayer(marker) : marker.remove();
   });
-  if (boundaryLayer) {
+  if (kind === 'boundary' && boundaryLayer) {
     if (layerState.boundary) boundaryLayer.addTo(map);
     else boundaryLayer.remove();
   }
@@ -150,8 +159,10 @@ function setLayerVisibility(kind) {
 
 async function start() {
   const response = await fetch('/api/dashboard');
+  if (!response.ok) throw new Error(`API dashboard ${response.status}`);
   const data = await response.json();
   renderNearby(data.nearby || []);
+
   const layersToggle = document.getElementById('layers-toggle');
   const layersPanel = document.querySelector('.map-sidebar');
   layersToggle.addEventListener('click', () => {
@@ -159,6 +170,7 @@ async function start() {
     layersToggle.setAttribute('aria-expanded', String(open));
     layersToggle.querySelector('span').textContent = open ? 'Tutup lapisan' : 'Lapisan';
   });
+
   // Layer tanpa titik koordinat disembunyikan sampai workbook memiliki data GPS valid.
   ['water', 'health'].forEach((layer) => {
     if (!data.spatial.points.some((point) => point.layer === layer || (layer === 'water' && point.layer === 'titik_sumber_air_kekeringan'))) {
@@ -170,25 +182,33 @@ async function start() {
     document.querySelectorAll('[data-layer="districtBoundary"]').forEach((element) => element.closest('.layer-toggle')?.remove());
     document.querySelectorAll('.map-floating-legend span').forEach((element) => { if (element.textContent.includes('Kecamatan')) element.remove(); });
   }
-  const [longitude, latitude] = data.spatial.points[0].coordinates;
+
+  const first = data.spatial.points[0]?.coordinates || [106.590328, -6.561262];
+  const [longitude, latitude] = first;
   map = L.map(mapElement, { zoomControl: false, scrollWheelZoom: true, touchZoom: true, dragging: true, doubleClickZoom: true, wheelPxPerZoomLevel: 90 }).setView([latitude, longitude], 13);
   L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 19 }).addTo(map);
-  markerCluster = window.L.markerClusterGroup ? L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: true, disableClusteringAtZoom: 17, maxClusterRadius: 42 }).addTo(map) : null;
+  // Tanpa disableClusteringAtZoom agar marker berkoordinat sama bisa di-spiderfy dan dipilih satu per satu.
+  markerCluster = window.L.markerClusterGroup ? L.markerClusterGroup({ showCoverageOnHover: false, spiderfyOnMaxZoom: true, maxClusterRadius: 42 }).addTo(map) : null;
   window.sadengMap = map;
+
   const bounds = [];
   if (data.spatial.boundary) {
     boundaryLayer = L.geoJSON(data.spatial.boundary, { style: { color: '#ff8966', weight: 2, fillColor: '#ff8966', fillOpacity: .12, dashArray: '7 6' } }).addTo(map);
-    bounds.push([boundaryLayer.getBounds().getSouth(), boundaryLayer.getBounds().getWest()], [boundaryLayer.getBounds().getNorth(), boundaryLayer.getBounds().getEast()]);
+    const b = boundaryLayer.getBounds();
+    bounds.push([b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]);
   }
   if (data.spatial.districtBoundary) {
     districtBoundaryLayer = L.geoJSON(data.spatial.districtBoundary, { style: { color: '#8bd7ff', weight: 2.5, fillColor: '#8bd7ff', fillOpacity: .05, dashArray: '3 9' } }).addTo(map);
-    bounds.push([districtBoundaryLayer.getBounds().getSouth(), districtBoundaryLayer.getBounds().getWest()], [districtBoundaryLayer.getBounds().getNorth(), districtBoundaryLayer.getBounds().getEast()]);
+    const b = districtBoundaryLayer.getBounds();
+    bounds.push([b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]);
   }
   if (data.spatial.routes?.length) {
     evacuationLayer = L.featureGroup();
     data.spatial.routes.forEach((route) => {
-      L.geoJSON({ type: 'Feature', properties: route, geometry: route.geometry }, { style: { color: '#72d3c4', weight: 4, opacity: .9, dashArray: '9 7' } }).bindPopup(`<strong>${route.nama || 'Jalur evakuasi'}</strong><br><small>${route.status_verifikasi_jalur || 'Jalur survei'}</small>`).addTo(evacuationLayer);
+      L.geoJSON({ type: 'Feature', properties: route, geometry: route.geometry }, { style: { color: '#72d3c4', weight: 4, opacity: .9, dashArray: '9 7' } })
+        .bindPopup(`<strong>${esc(route.nama || 'Jalur evakuasi')}</strong><br><small>${esc(route.status_verifikasi_jalur || 'Jalur survei')}</small>`)
+        .addTo(evacuationLayer);
     });
     evacuationLayer.addTo(map);
   }
@@ -201,10 +221,14 @@ async function start() {
     else marker.addTo(map);
     bounds.push([point.coordinates[1], point.coordinates[0]]);
   });
-  map.fitBounds(bounds, { padding: [40, 40] });
+  if (bounds.length) map.fitBounds(bounds, { padding: [40, 40] });
   document.getElementById('location-count').textContent = data.spatial.points.length;
   document.getElementById('map-status').textContent = `${data.spatial.points.length} titik · batas administratif aktif`;
-  document.querySelectorAll('[data-layer]:not([data-layer="route"])').forEach((input) => input.addEventListener('change', (event) => { layerState[event.target.dataset.layer] = event.target.checked; setLayerVisibility(event.target.dataset.layer); }));
+
+  document.querySelectorAll('[data-layer]:not([data-layer="route"])').forEach((input) => input.addEventListener('change', (event) => {
+    layerState[event.target.dataset.layer] = event.target.checked;
+    setLayerVisibility(event.target.dataset.layer);
+  }));
   document.querySelector('[data-layer="route"]').addEventListener('change', (event) => {
     layerState.route = event.target.checked;
     if (event.target.checked) showRoute([longitude, latitude]);
@@ -216,7 +240,7 @@ function renderNearby(items) {
   const sidebar = document.querySelector('.map-sidebar');
   const note = document.createElement('section');
   note.className = 'nearby-note';
-  note.innerHTML = `<strong>Yang perlu diketahui</strong>${items.map((item) => `<div><span>${item.kind}</span><b>${item.name}</b><small>${item.detail}</small></div>`).join('')}`;
+  note.innerHTML = `<strong>Yang perlu diketahui</strong>${items.map((item) => `<div><span>${esc(item.kind)}</span><b>${esc(item.name)}</b><small>${esc(item.detail)}</small></div>`).join('')}`;
   sidebar.appendChild(note);
 }
 

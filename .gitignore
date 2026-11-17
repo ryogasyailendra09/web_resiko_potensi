@@ -1,4 +1,4 @@
-# Local configuration and secrets
+# ---- Konfigurasi & rahasia ----
 .env
 .env.*
 !.env.example
@@ -7,17 +7,51 @@ private/
 *.pem
 *.key
 *.crt
+*.p12
+*.pfx
+id_rsa*
+service-account*.json
+credentials*.json
 
-# Sensitive or working datasets
+# ---- Dataset sensitif / kerja lokal (semua level folder di bawah data/) ----
 data/private/
 data/rahasia/
-data/*sensitive*
-data/*rahasia*
-data/*.xlsx
-data/*.xls
-data/*.zip
+data/**/*sensitive*
+data/**/*rahasia*
+data/**/*.xlsx
+data/**/*.xls
+data/**/*.csv
+data/**/*.zip
+data/**/*.rar
+data/**/*.7z
+data/**/*.sqlite
+data/**/*.db
 
-# Runtime and editor output
+# ---- Data spasial mentah ukuran besar (RBI/BIG), tetap dipakai lokal oleh extract.py ----
+data/**/*.gdb/
+data/**/*.shp
+data/**/*.shx
+data/**/*.dbf
+data/**/*.prj
+data/**/*.cpg
+data/**/*.sbn
+data/**/*.sbx
+data/**/*.gpkg
+
+# ---- Data lapangan: foto mentah & rekaman GPS (bisa memuat wajah/lokasi rumah warga) ----
+data/photos/raw/
+data/tracks/
+*.gpx
+
+# ---- Runtime, dependency, editor, OS ----
 *.log
+npm-debug.log*
 node_modules/
-.vscode/settings.json
+__pycache__/
+*.pyc
+.venv/
+venv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
